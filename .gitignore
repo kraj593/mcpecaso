@@ -89,6 +89,8 @@ ENV/
 .ropeproject
 .idea/
 
-# deprecated and tests
+# deprecated
 deprecated/
-tests/
+
+# Test
+test.ipynb
