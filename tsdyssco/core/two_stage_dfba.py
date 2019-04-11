@@ -27,10 +27,10 @@ def conc_change(concentrations, time, fluxes, null):
     for i in range(len(concentrations)):
         
         if concentrations[1] > 0: 
-            dydt.append(concentrations[0]*fluxes[i])
+            dCdt.append(concentrations[0]*fluxes[i])
             
         else:
-            dydt.append(0)
+            dCdt.append(0)
 
     return dCdt
 
