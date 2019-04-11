@@ -73,11 +73,6 @@ def titlemaker(title):
     return new_title
         
 
-#TODO: accept a dictionary (maybe a list of dictionaries?) containing prodEnv data. What could be useful?
-# Substrate uptake, production envelope, yield envelope - better to have vertically
-# Generate as many sets of traces as conditions. dictionary of dictionaries? up to a max of 5? see how many envelopes can be rendered
-# on a laptop screen. How about putting all of them on the same plot?!
-# Convert plotly to latest version???
 
 def plot_envelopes(data):
     
