@@ -1,7 +1,7 @@
 import numpy as np
 import cameo,cobra
 import pandas as pd
-import plotting
+from .. import plotting
 
 
 def growth_dependent_uptake(growth_rate, B=0):
