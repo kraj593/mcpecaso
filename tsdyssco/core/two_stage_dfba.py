@@ -4,7 +4,7 @@ import pandas as pd
 from scipy.integrate import odeint
 
 
-def crop_dFBA_timecourse_data(dFBA_data, t):
+def crop_dfba_timecourse_data(dFBA_data, t):
     
     """This function takes in dFBA data and timepoints and crops them to the point where substrate
     is over. dFBA data should be in the format: [[biomass,substrate,product]...] and timepoints are
@@ -17,41 +17,40 @@ def crop_dFBA_timecourse_data(dFBA_data, t):
     return dFBA_data[:substrate_consumed_index + 1], t[:substrate_consumed_index + 1]
 
 
-def conc_change(concentrations, time, fluxes, null):
+def dfba_fun(concentrations, time, fluxes):
 
     """This function returns the time derivatives for biomass, substrate and products respectively.
-       The concentrations are in the order: [Biomass, Substrate, Products...]"""
+       The concentrations are in the order: [Biomass, Substrate, Products]"""
 
-    dCdt=[]
+    dcdt=[]
     
     for i in range(len(concentrations)):
-        
         if concentrations[1] > 0: 
-            dCdt.append(concentrations[0]*fluxes[i])
+            dcdt.append(concentrations[0]*fluxes[i])
             
         else:
-            dCdt.append(0)
+            dcdt.append(0)
 
-    return dCdt
+    return dcdt
 
 
 def one_stage_timecourse(initial_concs, time, fluxes):
     
-    """This function employs odeint and returns timecourse data using dFBA
-        y0 is a vector containing initial concentrations
-        y[0] = Biomass Concentration
-        y[1] = Substrate Concentration
-        y[2-n] = Products Concentration
-        t is a timepoint vector
+    """This function employs odeint and returns timecourse data for one stage using dFBA
+        initial_concs is a vector containing initial concentrations
+        data[0] = Biomass Concentration
+        data[1] = Substrate Concentration
+        data[2-n] = Products Concentration
+        time is a timepoint vector
         fluxes is a vector containing flux data for biomass, substrate and products respectively"""
 
-
-    (data, full_output) = odeint(conc_change, initial_concs, time, args=(fluxes,0), full_output=1)
-    data, time = crop_dFBA_timecourse_data(data, time)
+    (data, full_output) = odeint(dfba_fun, initial_concs, time, args=tuple([fluxes]), full_output=1)
+    data, time = crop_dfba_timecourse_data(data, time)
     return data.transpose(), time
 
-def generate_two_stage_timecourse_data(initial_concs, time_end, time_switch, two_stage_fluxes):
-    
+
+def two_stage_timecourse(initial_concs, time_end, time_switch, two_stage_fluxes):
+
     """This function generates two_stage dFBA data
        y0 is a vector containing initial concentrations
        t_end is the batch end time
