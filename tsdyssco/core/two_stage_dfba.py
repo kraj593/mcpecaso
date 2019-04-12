@@ -4,17 +4,17 @@ import pandas as pd
 from scipy.integrate import odeint
 
 
-def crop_dfba_timecourse_data(dFBA_data, t):
+def crop_dfba_timecourse_data(dfba_data, t):
     
     """This function takes in dFBA data and timepoints and crops them to the point where substrate
     is over. dFBA data should be in the format: [[biomass,substrate,product]...] and timepoints are
     a list of timepoints."""
     
-    if any(dFBA_data[:, 1] <= 0):
-        substrate_consumed_index= np.where(dFBA_data[:, 1] <= 0)[0][0]
+    if any(dfba_data[:, 1] <= 0):
+        substrate_consumed_index = np.where(dfba_data[:, 1] <= 0)[0][0]
     else:
         substrate_consumed_index = len(t) - 1
-    return dFBA_data[:substrate_consumed_index + 1], t[:substrate_consumed_index + 1]
+    return dfba_data[:substrate_consumed_index + 1], t[:substrate_consumed_index + 1]
 
 
 def dfba_fun(concentrations, time, fluxes):
