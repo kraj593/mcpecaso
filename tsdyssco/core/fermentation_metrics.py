@@ -2,7 +2,7 @@ def batch_productivity(dfba_data, time_end):
     """ This function returns the productivity of a batch.
         Input dfba_data should be in the order [biomass, substrate, product]"""
 
-    return dfba_data[2, -1] / time_end
+    return dfba_data[2, -1] / time_end[-1]
 
 
 def batch_yield(dfba_data, time_end):
