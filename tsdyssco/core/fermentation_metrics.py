@@ -10,3 +10,10 @@ def batch_yield(dfba_data, time_end):
         Input dfba_data should be in the order [biomass, substrate, product]"""
 
     return (dfba_data[2, -1] - dfba_data[2, 0]) / (dfba_data[1, 0] - dfba_data[1, -1])
+
+
+def batch_end_titer(dfba_data, time_end):
+    """ This function returns the end titer of a batch.
+        Input dfba_data should be in the order [biomass, substrate, product]"""
+
+    return dfba_data[2,-1]
