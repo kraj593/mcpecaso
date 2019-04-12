@@ -16,13 +16,12 @@ def batch_end_titer(dfba_data, time_end):
     """ This function returns the end titer of a batch.
         Input dfba_data should be in the order [biomass, substrate, product]"""
 
-    return dfba_data[2,-1]
+    return dfba_data[2, -1]
 
 
 def dupont_metric(dfba_data, time_end):
     """ This function returns the approximate dupont metric of a batch.
         Input dfba_data should be in the order [biomass, substrate, product]"""
 
-    metric = batch_productivity(dfba_data, time_end)*(1-1/batch_yield(dfba_data, time_end))
+    return batch_productivity(dfba_data, time_end)*(1-1/batch_yield(dfba_data, time_end))
 
-    return metric
