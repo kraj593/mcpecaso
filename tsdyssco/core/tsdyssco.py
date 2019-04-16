@@ -18,6 +18,7 @@ class tsdyssco(object):
         self.condition = 'None'
         self.production_envelope = pd.DataFrame()
         self.model_complete_flag = False
+        self.two_stage_fermentation_list = []
         for key in kwargs:
 
             if key in ['model', 'biomass_rxn', 'substrate_rxn', 'target_rxn', 'condition']:
