@@ -14,10 +14,12 @@ def optimal_switch_time(initial_concs, time_end, two_stage_fluxes, objective_fun
                                  args=(initial_concs, time_end, two_stage_fluxes, objective_fun),
                                  bounds=[0, time_end], options={'maxiter': 1000000}, method='brent')
 
+    temp_data, temp_time = two_stage_timecourse(initial_concs, time_end, opt_result.x, two_stage_fluxes)
+
     if opt_result.x <= 0:
         opt_result.x = 0
-    elif opt_result.x > time_end:
-        opt_result.x = time_end
+    elif opt_result.x > temp_time[-1]:
+        opt_result.x = temp_time[-1]
     return opt_result
 
 
