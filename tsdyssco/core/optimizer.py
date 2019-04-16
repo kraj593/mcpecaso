@@ -5,7 +5,7 @@ from scipy.optimize import minimize_scalar
 
 def optimization_target(time_switch, initial_concs, time_end, two_stage_fluxes, objective_fun):
     data, time = two_stage_timecourse(initial_concs, time_end, time_switch, two_stage_fluxes)
-    return objective_fun(data, time)
+    return -objective_fun(data, time)
 
 
 def optimal_switch_time(initial_concs, time_end, two_stage_fluxes, objective_fun=batch_productivity):
