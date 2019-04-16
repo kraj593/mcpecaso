@@ -16,8 +16,8 @@ def optimal_switch_time(initial_concs, time_end, two_stage_fluxes, objective_fun
 
     if opt_result.x <= 0:
         opt_result.x = 0
-    elif opt_result.x > t_end:
-        opt_result.x = t_end
+    elif opt_result.x > time_end:
+        opt_result.x = time_end
     return opt_result
 
 
