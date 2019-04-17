@@ -6,6 +6,7 @@ from .TwoStageFermentation import *
 from joblib import Parallel, delayed
 import multiprocessing
 import time
+from warnings import warn
 
 
 class TSDyssco(object):
@@ -52,7 +53,7 @@ class TSDyssco(object):
             print("Your model is complete.")
             self.model_complete_flag = True
         else:
-            print("Production envelopes could not be generated.")
+            warn("Production envelopes could not be generated.")
 
     def calculate_production_envelope(self):
         self.check_model_complete()
