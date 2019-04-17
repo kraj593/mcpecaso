@@ -4,6 +4,7 @@ from plotly import tools
 import plotly.graph_objs as go
 import warnings
 import numpy as np
+from tsdyssco.core.TSDyssco import TSDyssco
 import plotly.plotly as py
 
 try:
@@ -174,7 +175,7 @@ def multiplot_envelopes(data):
 
 
 def plot_envelope(dyssco):
-    if str(type(dyssco)) == 'tsdyssco.core.TSDyssco.TSDyssco':
+    if str(type(dyssco)) == TSDyssco:
         envelope = dyssco.production_envelope
         if envelope is not None:
             target_metabolite = list(dyssco.target_rxn.metabolites.keys())[0].name
