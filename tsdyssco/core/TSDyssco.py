@@ -30,7 +30,7 @@ class TSDyssco(object):
     def check_model_complete(self):
         self.model_complete_flag = False
         flag = True
-        if type(self.model)!= cobra.core.model.Model:
+        if type(self.model) != cobra.core.model.Model:
             print("Please check your model. It is not a standard COBRApy model.")
             flag = False
 
