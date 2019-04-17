@@ -201,6 +201,7 @@ def plot_envelope(dyssco):
 
     for col in range(3):
         fig['layout']['xaxis' + str(col + 1)]['ticks'] = 'outside'
+        fig['layout']['xaxis' + str(col + 1)]['zeroline'] = True
         fig['layout']['yaxis' + str(col + 1)]['ticks'] = 'outside'
         fig['layout']['xaxis' + str(col + 1)]['title'] = 'Growth Rate (1/h)'
 
@@ -208,8 +209,8 @@ def plot_envelope(dyssco):
     fig['layout']['yaxis2']['title'] = 'Product Flux<br>(mmol/gdw.h)'
     fig['layout']['yaxis3']['title'] = 'Product Yield<br>(mmol/mmol substrate)'
     fig['layout']['showlegend'] = False
-    fig['layout']['title'] = str(target_metabolite) + 'Production Characteristics in ' + str(dyssco.model.id)\
-                             + 'with Km = ' + str(k_m)
+    fig['layout']['title'] = str(target_metabolite) + ' production characteristics in ' + str(dyssco.model.id)\
+                             + ' with Km = ' + str(k_m)
     fig['layout']['height'] = 500
     fig['layout']['width'] = 1000
 
