@@ -51,6 +51,8 @@ class TSDyssco(object):
         if flag:
             print("Your model is complete.")
             self.model_complete_flag = True
+        else:
+            print("Production envelopes could not be generated.")
 
     def calculate_production_envelope(self):
         self.check_model_complete()
