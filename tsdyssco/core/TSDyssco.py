@@ -8,7 +8,7 @@ from .optimizer import
 
 
 
-class tsdyssco(object):
+class TSDyssco(object):
 
     def __init__(self, **kwargs):
         self.model = None
