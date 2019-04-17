@@ -6,15 +6,6 @@ from .TwoStageFermentation import *
 from joblib import Parallel, delayed
 import multiprocessing
 
-try:
-    temp = __IPYTHON__
-except NameError:
-    ipy = False
-else:
-    ipy = True
-    import ipyparallel as ipp
-    ipp.register_joblib_backend()
-
 
 class TSDyssco(object):
 
@@ -81,16 +72,10 @@ class TSDyssco(object):
         if settings.parallel:
             print('Starting parallel pool')
             num_cores = multiprocessing.cpu_count()
-            if ipy:
-                ts_ferm_list = Parallel(backend='ipyparallel', n_jobs=-1, verbose=5)(
-                    delayed(TwoStageFermentation)(flux_list[stage_one_index], flux_list[stage_two_index])
-                    for stage_one_index in range(len(flux_list))
-                    for stage_two_index in range(len(flux_list)))
-            else:
-                ts_ferm_list = Parallel(n_jobs=num_cores)(
-                    delayed(TwoStageFermentation)(flux_list[stage_one_index], flux_list[stage_two_index])
-                    for stage_one_index in range(len(flux_list))
-                    for stage_two_index in range(len(flux_list)))
+            ts_ferm_list = Parallel(n_jobs=num_cores)(
+                delayed(TwoStageFermentation)(flux_list[stage_one_index], flux_list[stage_two_index])
+                for stage_one_index in range(len(flux_list))
+                for stage_two_index in range(len(flux_list)))
         else:
 
             ts_ferm_list = [TwoStageFermentation(flux_list[stage_one_index], flux_list[stage_two_index])
