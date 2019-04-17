@@ -1,19 +1,20 @@
 from .optimizer import optimal_switch_time
 from .two_stage_dfba import two_stage_timecourse
 from .fermentation_metrics import *
-from ..settings import *
+from .settings import settings
 
 objective_dict = {'productivity':batch_productivity,
-                  'yield':batch_yield,
-                  'titer':batch_end_titer,
-                  'dupont':dupont_metric}
+                  'yield': batch_yield,
+                  'titer': batch_end_titer,
+                  'dupont': dupont_metric}
+
 
 class TwoStageFermentation(object):
     def __init__(self, stage_one_fluxes, stage_two_fluxes, **kwargs):
         self.stage_one_fluxes = stage_one_fluxes
         self.stage_two_fluxes = stage_two_fluxes
-        self.initial_concentrations = [initial_biomass, initial_substrate, initial_product]
-        self.time_end = time_end
+        self.initial_concentrations = [settings.initial_biomass, settings.initial_substrate, settings.initial_product]
+        self.time_end = settings.time_end
         self.data = []
         self.time = []
         self.optimal_switch_time = None
@@ -21,8 +22,8 @@ class TwoStageFermentation(object):
         self.batch_productivity = None
         self.batch_titer = None
         try:
-            self.objective = objective_dict[objective]
-        except:
+            self.objective = objective_dict[settings.objective]
+        except KeyError:
             print("Invalid objective. Please check your tsdyssco objective in the settings file.")
             self.objective = objective_dict['productivity']
 
