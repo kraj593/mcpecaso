@@ -175,7 +175,8 @@ def multiplot_envelopes(data):
 
 
 def plot_envelope(dyssco):
-    if str(type(dyssco)) == TSDyssco:
+    display(TSDyssco)
+    if type(dyssco) == TSDyssco:
         envelope = dyssco.production_envelope
         if envelope is not None:
             target_metabolite = list(dyssco.target_rxn.metabolites.keys())[0].name
