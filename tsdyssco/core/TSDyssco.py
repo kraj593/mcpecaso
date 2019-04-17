@@ -1,4 +1,3 @@
-import cameo
 import cobra
 from ..settings import *
 import pandas as pd
