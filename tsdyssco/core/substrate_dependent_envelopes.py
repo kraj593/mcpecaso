@@ -1,7 +1,6 @@
 import numpy as np
 import cameo,cobra
 import pandas as pd
-from .. import plotting
 
 
 def growth_dependent_uptake(growth_rate, B=0):
@@ -54,25 +53,3 @@ def envelope_calculator(model, biomass_rxn, substrate_rxn, target_rxn, k_m=0, n_
                      production_rates_lb, production_rates_ub, yield_lb, yield_ub]))
     
     return data
-
-
-def multi_envelope_generator(input_dict, condition_list=[], n_search_points=20, plot_flag=False):
-                                  
-    if len(condition_list)!=len(input_dict):
-        print('Inconsistent Inputs')
-        return 0
-    
-    data_dict = dict()
-    for condition in condition_list:
-        print("Running Condition:", condition, "...", end='')
-        data_dict[condition] = envelope_calculator(input_dict[condition]['model'], input_dict[condition]['biomass_rxn'],
-                                                   input_dict[condition]['substrate_rxn'],
-                                                   input_dict[condition]['target_rxn'],
-                                                   input_dict[condition]['k_m'], n_search_points)
-
-        print('done')
-                             
-    if plot_flag:
-        plotting.multiplot_envelopes(data_dict)
-
-    return data_dict
