@@ -70,7 +70,7 @@ class TSDyssco(object):
             self.calculate_production_envelope()
         envelope = self.production_envelope
         flux_list = [list(envelope[['growth_rates', 'substrate_uptake_rates', 'production_rates_ub']].iloc[i]) for i in
-                    range(len(envelope))]
+                     range(len(envelope))]
         for i in range(len(flux_list)):
             flux_list[i][1] = -flux_list[i][1]
         if settings.parallel:
@@ -88,6 +88,7 @@ class TSDyssco(object):
                             for stage_one_index in range(len(flux_list))
                             for stage_two_index in range(len(flux_list))]
             end_time = time.time()
+        time.sleep(0.5)
         print("Completed analysis in ", str(end_time-start_time), "s")
         for ts_ferm in ts_ferm_list:
             self.add_fermentation(ts_ferm)
