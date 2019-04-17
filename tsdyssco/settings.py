@@ -5,4 +5,5 @@ num_points = 50
 objective = 'productivity'
 initial_biomass = 0.05
 initial_substrate = 50
-initial product = 0
+initial_product = 0
+time_end = 20
