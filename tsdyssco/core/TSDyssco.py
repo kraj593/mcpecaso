@@ -74,7 +74,7 @@ class TSDyssco(object):
             print('Starting parallel pool')
             num_cores = multiprocessing.cpu_count()
             start_time = time.time()
-            ts_ferm_list = Parallel(n_jobs=num_cores)(
+            ts_ferm_list = Parallel(n_jobs=num_cores, verbose=5)(
                 delayed(TwoStageFermentation)(flux_list[stage_one_index], flux_list[stage_two_index])
                 for stage_one_index in range(len(flux_list))
                 for stage_two_index in range(len(flux_list)))
