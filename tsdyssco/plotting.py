@@ -227,3 +227,9 @@ def plot_envelope(dyssco):
             fig['layout']['width'] = 950
 
             plot(fig)
+
+        else:
+            warn('The given dyssco model does not contain a production envelope.')
+
+    else:
+        warn('The given object is not a tsdyssco object.')
