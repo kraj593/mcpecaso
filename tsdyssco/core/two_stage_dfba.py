@@ -59,8 +59,6 @@ def two_stage_timecourse(initial_concentrations, time_end, time_switch, two_stag
     
     num_of_points = 1000
     stage_one_fluxes, stage_two_fluxes = two_stage_fluxes
-    data_stage_one = []
-    data_stage_two = []
     stage_one_start_data = initial_concentrations
     
     # These two conditions are to ensure that the optimizer functions properly
