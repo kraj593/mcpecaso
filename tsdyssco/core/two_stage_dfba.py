@@ -21,7 +21,7 @@ def dfba_fun(concentrations, time, fluxes):
     """This function returns the time derivatives for biomass, substrate and products respectively.
        The concentrations are in the order: [Biomass, Substrate, Products]"""
 
-    dcdt=[]
+    dcdt = []
     
     for i in range(len(concentrations)):
         if concentrations[1] > 0: 
@@ -33,7 +33,7 @@ def dfba_fun(concentrations, time, fluxes):
     return dcdt
 
 
-def one_stage_timecourse(initial_concs, time, fluxes):
+def one_stage_timecourse(initial_concentrations, time, fluxes):
     
     """This function employs odeint and returns timecourse data for one stage using dFBA
         initial_concs is a vector containing initial concentrations
@@ -43,12 +43,12 @@ def one_stage_timecourse(initial_concs, time, fluxes):
         time is a timepoint vector
         fluxes is a vector containing flux data for biomass, substrate and products respectively"""
 
-    (data, full_output) = odeint(dfba_fun, initial_concs, time, args=tuple([fluxes]), full_output=True)
+    (data, full_output) = odeint(dfba_fun, initial_concentrations, time, args=tuple([fluxes]), full_output=True)
     data, time = crop_dfba_timecourse_data(data, time)
     return data.transpose(), time
 
 
-def two_stage_timecourse(initial_concs, time_end, time_switch, two_stage_fluxes):
+def two_stage_timecourse(initial_concentrations, time_end, time_switch, two_stage_fluxes):
 
     """This function generates two_stage timecourse data using dfba given flux vectors for the two stages
        initial_concs is a vector containing initial concentrations
@@ -61,7 +61,7 @@ def two_stage_timecourse(initial_concs, time_end, time_switch, two_stage_fluxes)
     stage_one_fluxes, stage_two_fluxes = two_stage_fluxes
     data_stage_one = []
     data_stage_two = []
-    stage_one_start_data = initial_concs
+    stage_one_start_data = initial_concentrations
     
     # These two conditions are to ensure that the optimizer functions properly
     if time_switch > time_end:
@@ -85,7 +85,7 @@ def two_stage_timecourse(initial_concs, time_end, time_switch, two_stage_fluxes)
     two_stage_data = np.concatenate((data_stage_one, data_stage_two), axis=1)
     time = np.concatenate((time_stage_one, t_stage_two), axis=0)
 
-    if two_stage_data[1][-1]>0:
+    if two_stage_data[1][-1] > 0:
         warnings.warn("Substrate has not been depleted. Please increase your batch time.")
     return two_stage_data, time
 
