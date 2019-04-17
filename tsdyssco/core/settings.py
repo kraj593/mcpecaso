@@ -10,4 +10,5 @@ class Settings:
         self.initial_product = 0
         self.time_end = 20
 
+
 settings = Settings()
