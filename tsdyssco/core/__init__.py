@@ -1,4 +1,4 @@
-from .substrate_dependent_envelopes import *
+from .substrate_dependent_envelopes import envelope_calculator, multi_envelope_generator
 from .two_stage_dfba import *
 from .TSDyssco import TSDyssco
 from .TwoStageFermentation import TwoStageFermentation
