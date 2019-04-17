@@ -51,10 +51,10 @@ class TSDyssco(object):
             flag = False
 
         if flag:
-            print("Your model is complete.")
+            print("The model is complete.")
             self.model_complete_flag = True
         else:
-            warn("Production envelopes could not be generated.")
+            warn("The model is incomplete. Please check to ensure all the required fields are present.")
 
     def calculate_production_envelope(self):
         self.check_model_complete()
@@ -63,6 +63,8 @@ class TSDyssco(object):
             self.production_envelope = pd.DataFrame(envelope_calculator(self.model, self.biomass_rxn,
                                                                         self.substrate_rxn, self.target_rxn,
                                                                         settings.k_m, settings.num_points))
+        else:
+            warn("The production envelope could not be generated.")
 
     def add_fermentation(self, two_stage_fermentation):
         self.two_stage_fermentation_list.append(two_stage_fermentation)
@@ -70,32 +72,35 @@ class TSDyssco(object):
     def calculate_two_stage_characteristics(self):
         if self.production_envelope is None:
             self.calculate_production_envelope()
-        envelope = self.production_envelope
-        flux_list = [list(envelope[['growth_rates', 'substrate_uptake_rates', 'production_rates_ub']].iloc[i]) for i in
-                     range(len(envelope))]
-        for i in range(len(flux_list)):
-            flux_list[i][1] = -flux_list[i][1]
-        if settings.parallel:
-            print('Starting parallel pool')
-            num_cores = multiprocessing.cpu_count()
-            start_time = time.time()
-            ts_ferm_list = Parallel(n_jobs=num_cores, verbose=5)(
-                delayed(TwoStageFermentation)(flux_list[stage_one_index], flux_list[stage_two_index])
-                for stage_one_index in range(len(flux_list))
-                for stage_two_index in range(len(flux_list)))
-            end_time = time.time()
+        if self.production_envelope is not None:
+            envelope = self.production_envelope
+            flux_list = [list(envelope[['growth_rates', 'substrate_uptake_rates', 'production_rates_ub']].iloc[i]) for i in
+                         range(len(envelope))]
+            for i in range(len(flux_list)):
+                flux_list[i][1] = -flux_list[i][1]
+            if settings.parallel:
+                print('Starting parallel pool')
+                num_cores = multiprocessing.cpu_count()
+                start_time = time.time()
+                ts_ferm_list = Parallel(n_jobs=num_cores, verbose=5)(
+                    delayed(TwoStageFermentation)(flux_list[stage_one_index], flux_list[stage_two_index])
+                    for stage_one_index in range(len(flux_list))
+                    for stage_two_index in range(len(flux_list)))
+                end_time = time.time()
+            else:
+                start_time = time.time()
+                ts_ferm_list = [TwoStageFermentation(flux_list[stage_one_index], flux_list[stage_two_index])
+                                for stage_one_index in range(len(flux_list))
+                                for stage_two_index in range(len(flux_list))]
+                end_time = time.time()
+            time.sleep(0.5)
+            print("Completed analysis in ", str(end_time-start_time), "s")
+            for ts_ferm in ts_ferm_list:
+                self.add_fermentation(ts_ferm)
+
         else:
-            start_time = time.time()
-            ts_ferm_list = [TwoStageFermentation(flux_list[stage_one_index], flux_list[stage_two_index])
-                            for stage_one_index in range(len(flux_list))
-                            for stage_two_index in range(len(flux_list))]
-            end_time = time.time()
-        time.sleep(0.5)
-        print("Completed analysis in ", str(end_time-start_time), "s")
-        for ts_ferm in ts_ferm_list:
-            self.add_fermentation(ts_ferm)
-
-
+            warn("A production envelope could not be generated for the given model. This is likely due to missing"
+                 "fields in the model.")
 
 
 
