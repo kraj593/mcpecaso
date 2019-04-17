@@ -70,7 +70,7 @@ def titlemaker(title):
     return new_title
         
 
-def plot_envelopes(data):
+def multiplot_envelopes(data):
     
     num_of_conditions = len(data)
     condition_list = list(data.keys())
@@ -171,5 +171,47 @@ def plot_envelopes(data):
     fig['layout']['width'] = 1000
     
     plot(fig)
-    
+
+
+def plot_envelope(dyssco):
+
+    envelope = dyssco.production_envelope
+    target_metabolite = list(dyssco.target_rxn.metabolites.keys())[0].name
+    k_m = dyssco.k_m
+    fig = tools.make_subplots(rows=1, cols=3, subplot_titles=['Substrate Uptake Rate', 'Product Flux', 'Product Yield'])
+    colors = get_colors(1)
+    fig.append_trace(go.Scatter(x=envelope['growth_rates'],
+                                y=envelope['substrate_uptake_rates'],
+                                line={'color': colors[0]},
+                                mode='lines'), 1, 1)
+
+    fig.append_trace(go.Scatter(x=list(reversed(envelope['growth_rates']))
+                                + list(envelope['growth_rates']),
+                                y=list(reversed(envelope['production_rates_lb']))
+                                + list(envelope['production_rates_ub']),
+                                line={'color': colors[0]},
+                                mode='lines', showlegend=False), 1, 2)
+
+    fig.append_trace(go.Scatter(x=list(reversed(envelope['growth_rates']))
+                                + list(envelope['growth_rates']),
+                                y=list(reversed(envelope['yield_lb']))
+                                + list(envelope['yield_ub']),
+                                line={'color': colors[0]},
+                                mode='lines', showlegend=False), 1, 3)
+
+    for col in range(3):
+        fig['layout']['xaxis' + str(col + 1)]['ticks'] = 'outside'
+        fig['layout']['yaxis' + str(col + 1)]['ticks'] = 'outside'
+        fig['layout']['xaxis' + str(col + 1)]['title'] = 'Growth Rate (1/h)'
+
+    fig['layout']['yaxis1']['title'] = 'Substrate Uptake<br>(mmol/gdw.h)'
+    fig['layout']['yaxis2']['title'] = 'Product Flux<br>(mmol/gdw.h)'
+    fig['layout']['yaxis3']['title'] = 'Product Yield<br>(mmol/mmol substrate)'
+    fig['layout']['showlegend'] = False
+    fig['layout']['title'] = str(target_metabolite) + 'Production Characteristics in ' + str(dyssco.model.id)\
+                             + 'with Km = ' + k_m
+    fig['layout']['height'] = 500
+    fig['layout']['width'] = 1000
+
+    plot(fig)
 
