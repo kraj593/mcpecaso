@@ -1,10 +1,8 @@
 import cobra
-from ..settings import *
+from .settings import settings
 import pandas as pd
 from .substrate_dependent_envelopes import envelope_calculator
 from .TwoStageFermentation import *
-
-
 
 
 class TSDyssco(object):
@@ -25,7 +23,6 @@ class TSDyssco(object):
 
         self.check_model_complete()
         self.calculate_production_envelope()
-
 
     def check_model_complete(self):
         self.model_complete_flag = False
@@ -49,7 +46,7 @@ class TSDyssco(object):
                   "and its parent is the model.")
             flag = False
 
-        if flag == True:
+        if flag:
             print("Your model is complete.")
             self.model_complete_flag = True
 
@@ -57,8 +54,8 @@ class TSDyssco(object):
         self.check_model_complete()
         if self.model_complete_flag:
             self.production_envelope = pd.DataFrame(envelope_calculator(self.model, self.biomass_rxn,
-                                                                    self.substrate_rxn, self.target_rxn,
-                                                                    k_m, num_points))
+                                                                        self.substrate_rxn, self.target_rxn,
+                                                                        settings.k_m, settings.num_points))
 
     def add_fermentation(self, two_stage_fermentation):
         self.two_stage_fermentation_list.append(two_stage_fermentation)
@@ -66,11 +63,11 @@ class TSDyssco(object):
     def calculate_two_stage_characteristics(self):
         if self.production_envelope is None:
             self.calculate_production_envelope()
-
+        envelope = self.production_envelope
         flux_list = [list(envelope[['growth_rates', 'substrate_uptake_rates', 'production_rates_ub']].iloc[i]) for i in
                     range(len(envelope))]
-        for i in range(len(fluxlist)):
-            flux_list[i][1] = -fluxlist[i][1]
+        for i in range(len(flux_list)):
+            flux_list[i][1] = -flux_list[i][1]
         ts_ferm_list = [TwoStageFermentation(flux_list[stage_one_index], flux_list[stage_two_index])
                         for stage_one_index in range(len(flux_list))
                         for stage_two_index in range(len(flux_list))]
