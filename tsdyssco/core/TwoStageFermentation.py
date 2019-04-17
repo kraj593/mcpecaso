@@ -10,7 +10,7 @@ objective_dict = {'productivity':batch_productivity,
 
 
 class TwoStageFermentation(object):
-    def __init__(self, stage_one_fluxes, stage_two_fluxes, **kwargs):
+    def __init__(self, stage_one_fluxes, stage_two_fluxes):
         self.stage_one_fluxes = stage_one_fluxes
         self.stage_two_fluxes = stage_two_fluxes
         self.initial_concentrations = [settings.initial_biomass, settings.initial_substrate, settings.initial_product]
