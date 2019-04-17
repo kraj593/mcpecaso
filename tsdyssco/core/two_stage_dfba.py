@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.integrate import odeint
+import warnings
 
 
 def crop_dfba_timecourse_data(dfba_data, t):
@@ -84,5 +85,7 @@ def two_stage_timecourse(initial_concs, time_end, time_switch, two_stage_fluxes)
     two_stage_data = np.concatenate((data_stage_one, data_stage_two), axis=1)
     time = np.concatenate((time_stage_one, t_stage_two), axis=0)
 
+    if two_stage_data[1][-1]>0:
+        warnings.warn("Substrate has not been depleted. Please increase your batch time.")
     return two_stage_data, time
 
