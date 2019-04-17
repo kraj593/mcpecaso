@@ -19,6 +19,7 @@ class TSDyssco(object):
         self.condition = 'None'
         self.production_envelope = None
         self.model_complete_flag = False
+        self.k_m = None
         self.two_stage_fermentation_list = []
         for key in kwargs:
 
@@ -58,6 +59,7 @@ class TSDyssco(object):
     def calculate_production_envelope(self):
         self.check_model_complete()
         if self.model_complete_flag:
+            self.k_m = settings.k_m
             self.production_envelope = pd.DataFrame(envelope_calculator(self.model, self.biomass_rxn,
                                                                         self.substrate_rxn, self.target_rxn,
                                                                         settings.k_m, settings.num_points))
