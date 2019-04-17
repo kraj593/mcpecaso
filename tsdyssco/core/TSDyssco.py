@@ -21,7 +21,6 @@ class TSDyssco(object):
             if key in ['model', 'biomass_rxn', 'substrate_rxn', 'target_rxn', 'condition']:
                 setattr(self, key, kwargs[key])
 
-        self.check_model_complete()
         self.calculate_production_envelope()
 
     def check_model_complete(self):
