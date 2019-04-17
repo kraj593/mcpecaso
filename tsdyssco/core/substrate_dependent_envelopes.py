@@ -73,6 +73,6 @@ def multi_envelope_generator(input_dict, condition_list=[], n_search_points=20, 
         print('done')
                              
     if plot_flag:
-        plotting.plot_envelopes(data_dict)
+        plotting.multiplot_envelopes(data_dict)
 
     return data_dict
