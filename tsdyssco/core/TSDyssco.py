@@ -5,6 +5,7 @@ from .substrate_dependent_envelopes import envelope_calculator
 from .TwoStageFermentation import *
 from joblib import Parallel, delayed
 import multiprocessing
+import time
 
 
 class TSDyssco(object):
@@ -72,15 +73,19 @@ class TSDyssco(object):
         if settings.parallel:
             print('Starting parallel pool')
             num_cores = multiprocessing.cpu_count()
+            start_time = time.time()
             ts_ferm_list = Parallel(n_jobs=num_cores)(
                 delayed(TwoStageFermentation)(flux_list[stage_one_index], flux_list[stage_two_index])
                 for stage_one_index in range(len(flux_list))
                 for stage_two_index in range(len(flux_list)))
+            end_time = time.time()
         else:
-
+            start_time = time.time()
             ts_ferm_list = [TwoStageFermentation(flux_list[stage_one_index], flux_list[stage_two_index])
                             for stage_one_index in range(len(flux_list))
                             for stage_two_index in range(len(flux_list))]
+            end_time = time.time()
+        print("Completed analysis in ", str(end_time-start_time), "s")
         for ts_ferm in ts_ferm_list:
             self.add_fermentation(ts_ferm)
 
