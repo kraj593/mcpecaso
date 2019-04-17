@@ -84,13 +84,13 @@ class TSDyssco(object):
             if ipy:
                 ts_ferm_list = Parallel(backend='ipyparallel', n_jobs=-1, verbose=5)(
                     delayed(TwoStageFermentation)(flux_list[stage_one_index], flux_list[stage_two_index])
-                    for stage_one_index in range(30)
-                    for stage_two_index in range(30))
+                    for stage_one_index in range(len(flux_list))
+                    for stage_two_index in range(len(flux_list)))
             else:
                 ts_ferm_list = Parallel(n_jobs=num_cores)(
                     delayed(TwoStageFermentation)(flux_list[stage_one_index], flux_list[stage_two_index])
-                    for stage_one_index in range(30)
-                    for stage_two_index in range(30))
+                    for stage_one_index in range(len(flux_list))
+                    for stage_two_index in range(len(flux_list)))
         else:
 
             ts_ferm_list = [TwoStageFermentation(flux_list[stage_one_index], flux_list[stage_two_index])
