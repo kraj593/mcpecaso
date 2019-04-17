@@ -229,7 +229,7 @@ def plot_envelope(dyssco):
             plot(fig)
 
         else:
-            warn('The given dyssco model does not contain a production envelope.')
+            warnings.warn('The given dyssco model does not contain a production envelope.')
 
     else:
-        warn('The given object is not a tsdyssco object.')
+        warnings.warn('The given object is not a tsdyssco object.')
