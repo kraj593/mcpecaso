@@ -74,12 +74,6 @@ def multiplot_envelopes(dyssco_list):
 
     if sum([type(dyssco) == TSDyssco for dyssco in dyssco_list]) == len(dyssco_list):
         num_of_conditions = len(dyssco_list)
-
-        if num_of_conditions > 4:
-            warnings.warn("You are trying to plot more than 4 conditions on the same plot. This function can handle a "
-                          "maximum of 4 conditions. Please retry with a list of 4 dyssco objects.")
-            return
-
         condition_list = [dyssco.condition for dyssco in dyssco_list]
 
         if len(set(condition_list)) != len(condition_list):
@@ -97,68 +91,72 @@ def multiplot_envelopes(dyssco_list):
         envelope_dict = {condition: dyssco.production_envelope
                          for condition, dyssco in zip(condition_list, dyssco_list)}
         colors = get_colors(len(condition_list))
+        max_growth = max([max(envelope['growth_rates']) for envelope in list(envelope_dict.values())])
+        max_uptake = max([max(envelope['substrate_uptake_rates']) for envelope in list(envelope_dict.values())])
+        max_flux = max([max(envelope['production_rates_ub']) for envelope in list(envelope_dict.values())])
+        max_yield = max([max(envelope['yield_ub']) for envelope in list(envelope_dict.values())])
 
-        fig = tools.make_subplots(rows=3, cols=num_of_conditions,
-                                  subplot_titles=[titlemaker(condition) for condition in condition_list],
-                                  vertical_spacing=0.07)
-        max_growth = 0
-        max_uptake = 0
-        max_flux = 0
-        max_yield = 0
+        if num_of_conditions <= 4:
+            fig = tools.make_subplots(rows=3, cols=num_of_conditions,
+                                      subplot_titles=[titlemaker(condition) for condition in condition_list],
+                                      vertical_spacing=0.07)
 
-        for col, condition in enumerate(envelope_dict):
+            for col, condition in enumerate(envelope_dict):
+                fig.append_trace(go.Scatter(x=envelope_dict[condition]['growth_rates'],
+                                            y=envelope_dict[condition]['substrate_uptake_rates'],
+                                            line={'color': colors[col]}, name='Glucose Uptake Rate',
+                                            mode='lines'), 1, col+1)
+                fig.append_trace(go.Scatter(x=list(reversed(envelope_dict[condition]['growth_rates']))
+                                            + list(envelope_dict[condition]['growth_rates']),
+                                            y=list(reversed(envelope_dict[condition]['production_rates_lb']))
+                                            + list(envelope_dict[condition]['production_rates_ub']),
+                                            line={'color': colors[col]}, name='Product Flux',
+                                            mode='lines'), 2, col+1)
+                fig.append_trace(go.Scatter(x=list(reversed(list(envelope_dict[condition]['growth_rates'])))
+                                            + list(envelope_dict[condition]['growth_rates']),
+                                            y=list(reversed(list(envelope_dict[condition]['yield_lb'])))
+                                            + list(envelope_dict[condition]['yield_ub']),
+                                            line={'color': colors[col]}, name='Product Yield',
+                                            mode='lines'), 3, col+1)
 
-            fig.append_trace(go.Scatter(x=envelope_dict[condition]['growth_rates'],
-                                        y=envelope_dict[condition]['substrate_uptake_rates'],
-                                        line={'color': colors[col]}, name='Glucose Uptake Rate',
-                                        mode='lines'), 1, col+1)
-            fig.append_trace(go.Scatter(x=list(reversed(envelope_dict[condition]['growth_rates']))
-                                        + list(envelope_dict[condition]['growth_rates']),
-                                        y=list(reversed(envelope_dict[condition]['production_rates_lb']))
-                                        + list(envelope_dict[condition]['production_rates_ub']),
-                                        line={'color': colors[col]}, name='Product Flux',
-                                        mode='lines'), 2, col+1)
-            fig.append_trace(go.Scatter(x=list(reversed(list(envelope_dict[condition]['growth_rates'])))
-                                        + list(envelope_dict[condition]['growth_rates']),
-                                        y=list(reversed(list(envelope_dict[condition]['yield_lb'])))
-                                        + list(envelope_dict[condition]['yield_ub']),
-                                        line={'color': colors[col]}, name='Product Yield',
-                                        mode='lines'), 3, col+1)
+                max_growth = max(max(envelope_dict[condition]['growth_rates']), max_growth)
+                max_uptake = max(max(envelope_dict[condition]['substrate_uptake_rates']), max_uptake)
+                max_flux = max(max(envelope_dict[condition]['production_rates_ub']), max_flux)
+                max_yield = max(max(envelope_dict[condition]['yield_ub']), max_yield)
 
-            max_growth = max(max(envelope_dict[condition]['growth_rates']), max_growth)
-            max_uptake = max(max(envelope_dict[condition]['substrate_uptake_rates']), max_uptake)
-            max_flux = max(max(envelope_dict[condition]['production_rates_ub']), max_flux)
-            max_yield = max(max(envelope_dict[condition]['yield_ub']), max_yield)
+            for row in range(3):
+                for col in range(num_of_conditions):
+                    fig['layout']['xaxis'+str(row*num_of_conditions+col+1)]['ticks'] = 'outside'
+                    fig['layout']['yaxis'+str(row*num_of_conditions+col+1)]['ticks'] = 'outside'
+                    fig['layout']['xaxis' + str(row*num_of_conditions+col+1)]['range'] = [0, np.around((max_growth +
+                                                                                          0.05), 1)]
+                    fig['layout']['xaxis' + str(row*num_of_conditions+col+1)]['dtick'] = np.around(max_growth / 5, 2)
 
-        for row in range(3):
-            for col in range(num_of_conditions):
-                fig['layout']['xaxis'+str(row*num_of_conditions+col+1)]['ticks'] = 'outside'
-                fig['layout']['yaxis'+str(row*num_of_conditions+col+1)]['ticks'] = 'outside'
-                fig['layout']['xaxis' + str(row*num_of_conditions+col+1)]['range'] = [0, np.around((max_growth +
-                                                                                      0.05), 1)]
-                fig['layout']['xaxis' + str(row*num_of_conditions+col+1)]['dtick'] = np.around(max_growth / 5, 2)
+                    if row == 0:
+                        fig['layout']['yaxis' + str(row*num_of_conditions+1)]['title'] = 'Substrate Uptake (mmol/gdw.h)'
+                        fig['layout']['xaxis'+str(row*num_of_conditions+col+1)]['title'] = 'Growth Rate (1/h)'
+                        fig['layout']['yaxis'+str(row*num_of_conditions+col+1)]['range'] = [0, 1.2*max_uptake]
 
-                if row == 0:
-                    fig['layout']['yaxis' + str(row*num_of_conditions+1)]['title'] = 'Substrate Uptake (mmol/gdw.h)'
-                    fig['layout']['xaxis'+str(row*num_of_conditions+col+1)]['title'] = 'Growth Rate (1/h)'
-                    fig['layout']['yaxis'+str(row*num_of_conditions+col+1)]['range'] = [0, 1.2*max_uptake]
+                    if row == 1:
+                        fig['layout']['yaxis' + str(row*num_of_conditions+1)]['title'] = 'Product Flux (mmol/gdw.h)'
+                        fig['layout']['xaxis'+str(row*num_of_conditions+col+1)]['title'] = 'Growth Rate (1/h)'
+                        fig['layout']['yaxis'+str(row*num_of_conditions+col+1)]['range'] = [0, 1.2*max_flux]
 
-                if row == 1:
-                    fig['layout']['yaxis' + str(row*num_of_conditions+1)]['title'] = 'Product Flux (mmol/gdw.h)'
-                    fig['layout']['xaxis'+str(row*num_of_conditions+col+1)]['title'] = 'Growth Rate (1/h)'
-                    fig['layout']['yaxis'+str(row*num_of_conditions+col+1)]['range'] = [0, 1.2*max_flux]
+                    if row == 2:
+                        fig['layout']['yaxis' + str(row*num_of_conditions+1)]['title'] = 'Product Yield<br>' \
+                                                                                         '(mmol/mmol substrate)'
+                        fig['layout']['xaxis'+str(row*num_of_conditions+col+1)]['title'] = 'Growth Rate (1/h)'
+                        fig['layout']['yaxis'+str(row*num_of_conditions+col+1)]['range'] = [0, 1.2*max_yield]
 
-                if row == 2:
-                    fig['layout']['yaxis' + str(row*num_of_conditions+1)]['title'] = 'Product Yield<br>' \
-                                                                                     '(mmol/mmol substrate)'
-                    fig['layout']['xaxis'+str(row*num_of_conditions+col+1)]['title'] = 'Growth Rate (1/h)'
-                    fig['layout']['yaxis'+str(row*num_of_conditions+col+1)]['range'] = [0, 1.2*max_yield]
+            fig['layout']['showlegend'] = False
+            fig['layout']['title'] = 'Production Characteristics'
+            fig['layout']['height'] = 850
+            fig['layout']['width'] = 950
+            plot(fig)
 
-        fig['layout']['showlegend'] = False
-        fig['layout']['title'] = 'Production Characteristics'
-        fig['layout']['height'] = 850
-        fig['layout']['width'] = 950
-        plot(fig)
+        else:
+            warnings.warn("You are trying to plot more than 4 conditions. All conditions can only be plotted on the"
+                          " same graph for each item.")
 
         fig = tools.make_subplots(rows=1, cols=3, subplot_titles=
                                   ['Substrate Uptake Rate', 'Product Flux', 'Product Yield'])
