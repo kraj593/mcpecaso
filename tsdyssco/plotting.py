@@ -118,12 +118,6 @@ def multiplot_envelopes(dyssco_list):
                                             + list(envelope_dict[condition]['yield_ub']),
                                             line={'color': colors[col]}, name='Product Yield',
                                             mode='lines'), 3, col+1)
-
-                max_growth = max(max(envelope_dict[condition]['growth_rates']), max_growth)
-                max_uptake = max(max(envelope_dict[condition]['substrate_uptake_rates']), max_uptake)
-                max_flux = max(max(envelope_dict[condition]['production_rates_ub']), max_flux)
-                max_yield = max(max(envelope_dict[condition]['yield_ub']), max_yield)
-
             for row in range(3):
                 for col in range(num_of_conditions):
                     fig['layout']['xaxis'+str(row*num_of_conditions+col+1)]['ticks'] = 'outside'
