@@ -90,7 +90,7 @@ def multiplot_envelopes(dyssco_list):
 
         envelope_check_list = [dyssco.production_envelope is None for dyssco in dyssco_list]
 
-        if not(all(envelope_check_list)):
+        if any(envelope_check_list):
             warnings.warn("One or more of the dyssco objects do not have a production envelope. Please ensure"
                           "that all your dyssco models are complete and that they have production envelopes.")
             return 0
