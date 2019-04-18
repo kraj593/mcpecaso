@@ -79,21 +79,21 @@ def multiplot_envelopes(dyssco_list):
         if num_of_conditions > 4:
             warnings.warn("You are trying to plot more than 4 conditions on the same plot. This function can handle a "
                           "maximum of 4 conditions. Please retry with a list of 4 dyssco objects.")
-            return 0
+            return
 
         condition_list = [dyssco.condition for dyssco in dyssco_list]
 
         if len(set(condition_list)) != len(condition_list):
             warnings.warn("You have duplicate conditions in your list of dyssco objects. Please ensure that the "
                           "conditions are unique in the list of dyssco objects and try again.")
-            return 0
+            return
 
         envelope_check_list = [dyssco.production_envelope is None for dyssco in dyssco_list]
 
         if any(envelope_check_list):
             warnings.warn("One or more of the dyssco objects do not have a production envelope. Please ensure"
                           "that all your dyssco models are complete and that they have production envelopes.")
-            return 0
+            return
 
         envelope_dict = {condition: dyssco.production_envelope
                          for condition, dyssco in zip(condition_list, dyssco_list)}
@@ -101,7 +101,7 @@ def multiplot_envelopes(dyssco_list):
 
         fig = tools.make_subplots(rows=3, cols=num_of_conditions,
                                   subplot_titles=[titlemaker(condition) for condition in condition_list],
-                                  vertical_spacing=0.1)
+                                  vertical_spacing=0.07)
         max_growth = 0
         max_uptake = 0
         max_flux = 0
@@ -157,7 +157,7 @@ def multiplot_envelopes(dyssco_list):
 
         fig['layout']['showlegend'] = False
         fig['layout']['title'] = 'Production Characteristics'
-        fig['layout']['height'] = 1000
+        fig['layout']['height'] = 1100
         fig['layout']['width'] = 950
         plot(fig)
 
