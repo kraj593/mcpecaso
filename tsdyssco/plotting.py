@@ -5,7 +5,6 @@ import plotly.graph_objs as go
 import warnings
 import numpy as np
 from tsdyssco.core.TSDyssco import TSDyssco
-import plotly.plotly as py
 
 try:
     _ = __IPYTHON__
@@ -157,7 +156,7 @@ def multiplot_envelopes(dyssco_list):
 
         fig['layout']['showlegend'] = False
         fig['layout']['title'] = 'Production Characteristics'
-        fig['layout']['height'] = 1100
+        fig['layout']['height'] = 850
         fig['layout']['width'] = 950
         plot(fig)
 
@@ -204,7 +203,6 @@ def multiplot_envelopes(dyssco_list):
 
 
 def plot_envelope(dyssco):
-    display(TSDyssco)
     if type(dyssco) == TSDyssco:
         envelope = dyssco.production_envelope
         if envelope is not None:
