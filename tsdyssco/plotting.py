@@ -135,6 +135,9 @@ def multiplot_envelopes(dyssco_list):
             for col in range(num_of_conditions):
                 fig['layout']['xaxis'+str(row*num_of_conditions+col+1)]['ticks'] = 'outside'
                 fig['layout']['yaxis'+str(row*num_of_conditions+col+1)]['ticks'] = 'outside'
+                fig['layout']['xaxis' + str(row*num_of_conditions+col+1)]['range'] = [0, np.around((max_growth +
+                                                                                      0.05), 1)]
+                fig['layout']['xaxis' + str(row*num_of_conditions+col+1)]['dtick'] = np.around(max_growth / 5, 2)
 
                 if row == 0:
                     fig['layout']['yaxis' + str(row + num_of_conditions)]['title'] = 'Substrate Uptake (mmol/gdw.h)'
@@ -155,7 +158,7 @@ def multiplot_envelopes(dyssco_list):
         fig['layout']['showlegend'] = False
         fig['layout']['title'] = 'Production Characteristics'
         fig['layout']['height'] = 1000
-        fig['layout']['width'] = 1000
+        fig['layout']['width'] = 950
         plot(fig)
 
         fig = tools.make_subplots(rows=1, cols=3, subplot_titles=
@@ -192,8 +195,8 @@ def multiplot_envelopes(dyssco_list):
         fig['layout']['legend']['y'] = -0.25
         fig['layout']['showlegend'] = True
         fig['layout']['title'] = 'Production Characteristics'
-        fig['layout']['height'] = 500
-        fig['layout']['width'] = 1000
+        fig['layout']['height'] = 425
+        fig['layout']['width'] = 950
         plot(fig)
 
     else:
@@ -234,8 +237,9 @@ def plot_envelope(dyssco):
                 fig['layout']['xaxis' + str(col + 1)]['zeroline'] = True
                 fig['layout']['yaxis' + str(col + 1)]['ticks'] = 'outside'
                 fig['layout']['xaxis' + str(col + 1)]['title'] = 'Growth Rate (1/h)'
-                fig['layout']['xaxis' + str(col + 1)]['range'] = [0, np.around(((max(envelope['growth_rates'])) + 0.05 - 0), 1)]
-                fig['layout']['xaxis' + str(col + 1)]['dtick'] = np.around(((max(envelope['growth_rates'])) - 0) / 5, 2)
+                fig['layout']['xaxis' + str(col + 1)]['range'] = [0, np.around(((max(envelope['growth_rates'])) +
+                                                                                0.05), 1)]
+                fig['layout']['xaxis' + str(col + 1)]['dtick'] = np.around((max(envelope['growth_rates'])) / 5, 2)
                 fig['layout']['xaxis' + str(col + 1)]['tick0'] = 0
 
             fig['layout']['yaxis1']['title'] = 'Substrate Uptake<br>(mmol/gdw.h)'
