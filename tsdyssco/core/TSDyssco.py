@@ -21,6 +21,8 @@ class TSDyssco(object):
         self.model_complete_flag = False
         self.k_m = None
         self.two_stage_fermentation_list = []
+        self.two_stage_best_batch = None
+        self.one_stage_best_batch = None
         for key in kwargs:
 
             if key in ['model', 'biomass_rxn', 'substrate_rxn', 'target_rxn', 'condition']:
@@ -68,6 +70,11 @@ class TSDyssco(object):
 
     def add_fermentation(self, two_stage_fermentation):
         self.two_stage_fermentation_list.append(two_stage_fermentation)
+        if self.two_stage_best_batch is not None:
+            if two_stage_fermentation.objective_value > self.two_stage_best_batch.objective_value:
+                self.two_stage_best_batch = two_stage_fermentation
+        else:
+            self.two_stage_best_batch = two_stage_fermentation
 
     def calculate_two_stage_characteristics(self):
         if self.production_envelope is None:
@@ -101,7 +108,5 @@ class TSDyssco(object):
         else:
             warn("A production envelope could not be generated for the given model. This is likely due to missing"
                  "fields in the model.")
-
-
 
 
