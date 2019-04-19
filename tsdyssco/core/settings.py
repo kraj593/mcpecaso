@@ -9,6 +9,10 @@ class Settings:
         self.initial_substrate = 50
         self.initial_product = 0
         self.time_end = 20
+        self.productivity_coefficient = 0
+        self.yield_coefficient = 0
+        self.titer_coefficient = 0
+        self.dupont_metric_coefficient = 0
 
 
 settings = Settings()
