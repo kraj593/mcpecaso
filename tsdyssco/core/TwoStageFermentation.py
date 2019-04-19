@@ -3,10 +3,11 @@ from .two_stage_dfba import two_stage_timecourse
 from .fermentation_metrics import *
 from .settings import settings
 
-objective_dict = {'productivity':batch_productivity,
-                  'yield': batch_yield,
-                  'titer': batch_end_titer,
-                  'dupont': dupont_metric}
+objective_dict = {'batch_productivity': batch_productivity,
+                  'batch_yield': batch_yield,
+                  'batch_titer': batch_end_titer,
+                  'dupont_metric': dupont_metric,
+                  'linear_combination': linear_combination}
 
 
 class TwoStageFermentation(object):
@@ -21,6 +22,9 @@ class TwoStageFermentation(object):
         self.batch_yield = None
         self.batch_productivity = None
         self.batch_titer = None
+        self.dupont_metric = None
+        self.linear_combination = None
+        self.objective_value = None
         try:
             self.objective = objective_dict[settings.objective]
         except KeyError:
@@ -41,5 +45,8 @@ class TwoStageFermentation(object):
         self.batch_productivity = batch_productivity(self.data, self.time)
         self.batch_yield = batch_yield(self.data, self.time)
         self.batch_titer = batch_end_titer(self.data, self.time)
+        self.dupont_metric = dupont_metric(self.data, self.time)
+        self.linear_combination = linear_combination(self.data, self.time)
+        self.objective_value = getattr(self, settings.objective)
 
 
