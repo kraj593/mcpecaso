@@ -1,5 +1,6 @@
 from .settings import settings
 
+
 def batch_productivity(dfba_data, time):
     """ This function returns the productivity of a batch.
         Input dfba_data should be in the order [biomass, substrate, product]"""
