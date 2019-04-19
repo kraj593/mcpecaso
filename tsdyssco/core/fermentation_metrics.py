@@ -27,11 +27,12 @@ def dupont_metric(dfba_data, time):
 
     return batch_productivity(dfba_data, time)*(1-1/batch_yield(dfba_data, time))
 
+
 def linear_combination(dfba_data, time):
     """ This function returns a linear combination of the above defined metrics in case it is needed as an
         objective function. Input dfba_data should be in the order [biomass, substrate, product]"""
 
     return settings.productivity_coefficient*batch_productivity(dfba_data, time) + \
-           settings.yield_coefficient*batch_yield(dfba_data, time) + \
-           settings.titer_coefficient*batch_end_titer(dfba_data, time) + \
-           settings.dupont_metric_coefficient*dupont_metric(dfba_data, time)
+        settings.yield_coefficient*batch_yield(dfba_data, time) + \
+        settings.titer_coefficient*batch_end_titer(dfba_data, time) + \
+        settings.dupont_metric_coefficient*dupont_metric(dfba_data, time)
