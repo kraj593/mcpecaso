@@ -6,7 +6,16 @@ from .Fermentation import *
 from joblib import Parallel, delayed
 import multiprocessing
 import time
-from warnings import warn
+import warnings
+
+objective_dict = {'batch_productivity': 'productivity',
+                  'batch_yield': 'yield',
+                  'batch_titer': 'titer',
+                  'dupont_metric': 'dupont metric',
+                  'linear_combination': str(settings.productivity_coefficient) + ' * productivity + ' +
+                                        str(settings.productivity_coefficient) + ' * yield + ' +
+                                        str(settings.productivity_coefficient) + ' * titer + ' +
+                                        str(settings.productivity_coefficient) + ' * dupont metric'}
 
 
 class TSDyssco(object):
@@ -31,6 +40,12 @@ class TSDyssco(object):
                                           'titer': [],
                                           'dupont metric': [],
                                           'objective value': []}
+        try:
+            self.objective_name = objective_dict[settings.objective]
+        except KeyError:
+            warnings.warn("Please check your objective. The objective provided in the settings class isn't valid.")
+            self.objective_name = objective_dict['batch_productivity']
+        self.objective = settings.objective
         self.one_stage_characteristics = {}
         for key in kwargs:
 
@@ -65,7 +80,7 @@ class TSDyssco(object):
             print("The model is complete.")
             self.model_complete_flag = True
         else:
-            warn("The model is incomplete. Please check to ensure all the required fields are present.")
+            warnings.warn("The model is incomplete. Please check to ensure all the required fields are present.")
 
     def calculate_production_envelope(self):
         self.check_model_complete()
@@ -75,7 +90,7 @@ class TSDyssco(object):
                                                                         self.substrate_rxn, self.target_rxn,
                                                                         settings.k_m, settings.num_points))
         else:
-            warn("The production envelope could not be generated.")
+            warnings.warn("The production envelope could not be generated.")
 
     def add_two_stage_fermentation(self, two_stage_fermentation):
         self.two_stage_fermentation_list.append(two_stage_fermentation)
@@ -105,8 +120,8 @@ class TSDyssco(object):
             self.calculate_production_envelope()
         if self.production_envelope is not None:
             envelope = self.production_envelope
-            flux_list = [list(envelope[['growth_rates', 'substrate_uptake_rates', 'production_rates_ub']].iloc[i]) for i in
-                         range(len(envelope))]
+            flux_list = [list(envelope[['growth_rates', 'substrate_uptake_rates', 'production_rates_ub']].iloc[i])
+                         for i in range(len(envelope))]
             for i in range(len(flux_list)):
                 flux_list[i][1] = -flux_list[i][1]
             if settings.parallel:
@@ -137,6 +152,6 @@ class TSDyssco(object):
                 self.add_one_stage_fermentation(os_ferm)
 
         else:
-            warn("A production envelope could not be generated for the given model. This is likely due to missing"
-                 "fields in the model.")
+            warnings.warn("A production envelope could not be generated for the given model. This is likely due to "
+                          "missing fields in the model.")
 
