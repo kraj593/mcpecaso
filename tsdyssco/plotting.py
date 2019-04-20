@@ -267,9 +267,10 @@ def two_stage_char_contour(dyssco):
         if ts_fermentations:
             target_metabolite = list(dyssco.target_rxn.metabolites.keys())[0].name
             characteristics = ['productivity', 'yield', 'titer', 'dupont metric', 'objective value']
-            units = ['mmol/L.h', 'mmol product/mmol substrate', 'mmol/L', 'a.u.', 'a.u.']
+            units = ['(mmol/L.h)', '(mmol product/mmol substrate)', '(mmol/L)', '(a.u.)', '(a.u.)']
             titles = [str(target_metabolite) + ' ' + characteristic + " distribution for two stage fermentation in "
-                      + str(dyssco.model.id) for characteristic in characteristics]
+                      + str(dyssco.model.id) + '. Objective: ' + str(dyssco.objective_name)
+                      for characteristic in characteristics]
             for row, characteristic in enumerate(characteristics):
                 trace = go.Contour(z=dyssco.two_stage_characteristics[characteristic],
                                    x=dyssco.two_stage_characteristics['stage_one_growth_rate'],
@@ -277,7 +278,7 @@ def two_stage_char_contour(dyssco):
                                    ncontours=20,
                                    contours=dict(coloring='heatmap', showlabels=True,
                                                  labelfont=dict(size=12, color='white')),
-                                   colorbar=dict(title=characteristic + '<br>' + units[row],
+                                   colorbar=dict(title=characteristic.title() + '<br>' + units[row],
                                                  titleside='right',
                                                  titlefont=dict(size=14),
                                                  nticks=15,
@@ -298,8 +299,8 @@ def two_stage_char_contour(dyssco):
                                                                       ['stage_two_growth_rate']))+0.05), 1)]
                 fig['layout']['yaxis']['dtick'] = np.around((max(dyssco.two_stage_characteristics
                                                                  ['stage_two_growth_rate'])) / 5, 2)
-                fig['layout']['yaxis']['title'] = 'Stage 2<br>Growth Rate(1/h)'
-                fig['layout']['xaxis']['title'] = 'Stage 1<br>Growth Rate(1/h)'
+                fig['layout']['yaxis']['title'] = 'Stage 2 Growth Rate<br>(1/h)'
+                fig['layout']['xaxis']['title'] = 'Stage 1 Growth Rate<br>(1/h)'
                 fig['layout']['xaxis']['ticks'] = 'outside'
                 fig['layout']['yaxis']['ticks'] = 'outside'
                 fig['layout']['height'] = 500
@@ -319,14 +320,32 @@ def two_stage_char_contour(dyssco):
 
 def multi_two_stage_char_contours(dyssco_list):
     if sum([type(dyssco) == TSDyssco for dyssco in dyssco_list]) == len(dyssco_list):
-        ts_fermentations = dyssco.two_stage_fermentation_list
+        num_of_conditions = len(dyssco_list)
+        condition_list = [dyssco.condition for dyssco in dyssco_list]
 
-        if ts_fermentations:
-            target_metabolite = list(dyssco.target_rxn.metabolites.keys())[0].name
+        if len(set(condition_list)) != len(condition_list):
+            warnings.warn("You have duplicate conditions in your list of dyssco objects. Please ensure that the "
+                          "conditions are unique in the list of dyssco objects and try again.")
+            return
+
+        ts_ferm_check_list = [len(dyssco.two_stage_fermentation_list) == 0 for dyssco in dyssco_list]
+
+        if any(ts_ferm_check_list):
+            warnings.warn("One or more of the dyssco objects do not have a production envelope. Please ensure"
+                          "that all your dyssco models are complete and that they have production envelopes.")
+            return
+
+        ts_char_dict = {condition: dyssco.two_stage_characteristics
+                        for condition, dyssco in zip(condition_list, dyssco_list)}
+        colors = get_colors(len(condition_list))
+        max_stage_one_growth = max([max(ts_char['stage_one_growth_rate']) for ts_char in list(ts_char_dict.values())])
+        max_stage_two_growth = max([max(ts_char['stage_two_growth_rate']) for ts_char in list(ts_char_dict.values())])
+
+        if num_of_conditions <= 3:
             characteristics = ['productivity', 'yield', 'titer', 'dupont metric', 'objective value']
-            units = ['mmol/L.h', 'mmol product/mmol substrate', 'mmol/L', 'a.u.', 'a.u.']
-            titles = [str(target_metabolite) + ' ' + characteristic + " distribution for two stage fermentations in "
-                      + str(dyssco.model.id) for characteristic in characteristics]
+            units = ['(mmol/L.h)', '(mmol product/mmol substrate)', '(mmol/L)', '(a.u.)', '(a.u.)']
+            titles = [characteristic.title() + " distribution for two stage fermentation"
+                      for characteristic in characteristics]
             for row, characteristic in enumerate(characteristics):
                 max_characteristic = max(
                     [max(dyssco.two_stage_characteristics[characteristic]) for dyssco in dyssco_list])
@@ -334,22 +353,22 @@ def multi_two_stage_char_contours(dyssco_list):
                     [min(dyssco.two_stage_characteristics[characteristic]) for dyssco in dyssco_list])
                 fig = tools.make_subplots(rows=1, cols=len(dyssco_list),
                                           subplot_titles=[dyssco.condition for dyssco in dyssco_list],
-                                          horizontal_spacing=0.07, print_grid=False)
+                                          horizontal_spacing=0.05, print_grid=False)
                 for col, dyssco in enumerate(dyssco_list):
                     fig.append_trace(go.Contour(z=dyssco.two_stage_characteristics[characteristic],
                                                 x=dyssco.two_stage_characteristics['stage_one_growth_rate'],
                                                 y=dyssco.two_stage_characteristics['stage_two_growth_rate'],
                                                 contours=dict(coloring='heatmap', showlabels=True,
-                                                              labelfont=dict(size=10, color='white')),
+                                                              labelfont=dict(size=12, color='white')),
                                                 colorscale='RdBu',
-                                                colorbar=dict(title=characteristic + '<br>' + units[row],
+                                                colorbar=dict(title=characteristic.title() + '<br>' + units[row],
                                                               titleside='right',
                                                               titlefont=dict(size=14),
                                                               nticks=10,
                                                               tick0=0,
                                                               ticks='outside',
-                                                              tickfont=dict(size=10),
-                                                              thickness=20,
+                                                              tickfont=dict(size=12),
+                                                              thickness=15,
                                                               showticklabels=True,
                                                               thicknessmode='pixels',
                                                               len=1.05,
@@ -357,22 +376,27 @@ def multi_two_stage_char_contours(dyssco_list):
                                                               outlinewidth=1),
                                                 zmin=min_characteristic, zmax=max_characteristic, ncontours=20), 1,
                                      col + 1)
+                    fig['layout']['xaxis'+str(col+1)]['range'] = [0, np.around((max_stage_one_growth + 0.05), 1)]
+                    fig['layout']['xaxis'+str(col+1)]['dtick'] = np.around(max_stage_one_growth / 5, 2)
+                    fig['layout']['yaxis'+str(col+1)]['range'] = [0, np.around((max_stage_two_growth + 0.05), 1)]
+                    fig['layout']['yaxis'+str(col+1)]['dtick'] = np.around(max_stage_two_growth / 5, 2)
 
                     fig['layout']['yaxis1']['title'] = 'Stage 2<br>Growth Rate(1/h)'
                     fig['layout']['xaxis' + str(col + 1)]['title'] = 'Stage 1<br>Growth Rate(1/h)'
                     fig['layout']['xaxis' + str(col + 1)]['ticks'] = 'outside'
                     fig['layout']['yaxis' + str(col + 1)]['ticks'] = 'outside'
-                fig['layout']['height'] = 425
-                fig['layout']['width'] = 100 + len(dyssco_list) * 300
+                fig['layout']['height'] = 415
+                fig['layout']['width'] = 100 + len(dyssco_list) * 285
                 # for item in fig['layout']['annotations']:
                 #    item['font'] = dict(size=14)
                 # fig['layout']['showlegend'] = True
-                fig['layout']['title'] = titlemaker(titles[row], 50)
+                fig['layout']['title'] = titlemaker(titles[row], 100)
 
                 plot(fig)
 
         else:
-            warnings.warn('The given dyssco model does not contain two stage fermentations.')
+            warnings.warn('There are too many dyssco objects in this list. This function can handle a maximum of 3'
+                          ' objects')
 
     else:
-        warnings.warn('The given object is not a tsdyssco object.')
+        warnings.warn('One or more of the objects in this list are not Dyssco objects.')
