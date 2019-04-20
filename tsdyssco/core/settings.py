@@ -4,7 +4,7 @@ class Settings:
         self.substrate_uptake = 'generalized_logistic'
         self.parallel = False
         self.num_points = 50
-        self.objective = 'productivity'
+        self.objective = 'batch_productivity'
         self.initial_biomass = 0.05
         self.initial_substrate = 50
         self.initial_product = 0
