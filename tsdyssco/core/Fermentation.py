@@ -29,7 +29,7 @@ class TwoStageFermentation(object):
             self.objective = objective_dict[settings.objective]
         except KeyError:
             print("Invalid objective. Please check your tsdyssco objective in the settings file.")
-            self.objective = objective_dict['productivity']
+            self.objective = objective_dict['batch_productivity']
 
         self.calculate_fermentation_data()
 
@@ -68,7 +68,7 @@ class OneStageFermentation(object):
             self.objective = objective_dict[settings.objective]
         except KeyError:
             print("Invalid objective. Please check your tsdyssco objective in the settings file.")
-            self.objective = objective_dict['productivity']
+            self.objective = objective_dict['batch_productivity']
 
         self.calculate_fermentation_data()
 
