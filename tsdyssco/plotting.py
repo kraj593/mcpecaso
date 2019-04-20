@@ -123,12 +123,14 @@ def multiplot_envelopes(dyssco_list):
                     fig['layout']['xaxis' + str(row*num_of_conditions+col+1)]['dtick'] = np.around(max_growth / 5, 2)
 
                     if row == 0:
-                        fig['layout']['yaxis' + str(row*num_of_conditions+1)]['title'] = 'Substrate Uptake (mmol/gdw.h)'
+                        fig['layout']['yaxis' + str(row*num_of_conditions+1)]['title'] = 'Substrate Uptake<br>' \
+                                                                                         '(mmol/gdw.h)'
                         fig['layout']['xaxis'+str(row*num_of_conditions+col+1)]['title'] = 'Growth Rate (1/h)'
                         fig['layout']['yaxis'+str(row*num_of_conditions+col+1)]['range'] = [0, 1.2*max_uptake]
 
                     if row == 1:
-                        fig['layout']['yaxis' + str(row*num_of_conditions+1)]['title'] = 'Product Flux (mmol/gdw.h)'
+                        fig['layout']['yaxis' + str(row*num_of_conditions+1)]['title'] = 'Product Flux<br>' \
+                                                                                         '(mmol/gdw.h)'
                         fig['layout']['xaxis'+str(row*num_of_conditions+col+1)]['title'] = 'Growth Rate (1/h)'
                         fig['layout']['yaxis'+str(row*num_of_conditions+col+1)]['range'] = [0, 1.2*max_flux]
 
