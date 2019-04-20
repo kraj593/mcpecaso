@@ -94,3 +94,10 @@ deprecated/
 
 # Test
 test.ipynb
+test-Copy1.ipynb
+
+# Pickled Files
+dyssco1.pickle
+dyssco2.pickle
+dyssco3.pickle
+dyssco4.pickle
