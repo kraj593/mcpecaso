@@ -40,13 +40,9 @@ plot = plot
 def get_colors(number_of_colors, colors=None, cl_scales=['9', 'qual', 'Set1']):
     if colors is None:
         color_scale = cl.scales[cl_scales[0]][cl_scales[1]][cl_scales[2]]
-        # https://plot.ly/ipython-notebooks/color-scales/
         if number_of_colors > int(cl_scales[0]):
             print('interpolated')
-            # num_pts = len(replicate_trials)
             colors = cl.interp(color_scale, 500)
-            # Index the list
-            # Index the list
             colors = [colors[int(x)] for x in np.arange(0, 500,
                                                         round(500 / number_of_colors))]
         else:
