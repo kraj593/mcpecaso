@@ -262,7 +262,7 @@ def two_stage_fermentation_char_heatmap(dyssco):
             target_metabolite = list(dyssco.target_rxn.metabolites.keys())[0].name
             characteristics = ['productivity', 'yield', 'titer', 'dupont metric', 'objective value']
             units = ['mmol/L.h', 'mmol product/mmol substrate', 'mmol/L', 'a.u.', 'a.u.']
-            titles = [str(target_metabolite) + ' ' + characteristic + " distributions for two stage fermentations in "
+            titles = [str(target_metabolite) + ' ' + characteristic + " distribution for two stage fermentations in "
                       + str(dyssco.model.id) for characteristic in characteristics]
             for row, characteristic in enumerate(characteristics):
                 trace = go.Contour(z=dyssco.two_stage_characteristics[characteristic],
