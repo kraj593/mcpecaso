@@ -261,32 +261,42 @@ def two_stage_fermentation_char_heatmap(dyssco):
         if ts_fermentations:
             target_metabolite = list(dyssco.target_rxn.metabolites.keys())[0].name
             characteristics = ['productivity', 'yield', 'titer', 'dupont metric', 'objective value']
-            titles = [str(target_metabolite) + characteristic + " distributions for two stage fermentations in "
+            units = ['mmol/L.h', 'mmol product/mmol substrate', 'mmol/L', 'a.u.', 'a.u.']
+            titles = [str(target_metabolite) + ' ' + characteristic + " distributions for two stage fermentations in "
                       + str(dyssco.model.id) for characteristic in characteristics]
-            fig = tools.make_subplots(rows=5, cols=1, subplot_titles=[title for title in titles],
-                                      print_grid=False)
             for row, characteristic in enumerate(characteristics):
-                fig.append_trace(go.Contour(z=dyssco.two_stage_characteristics[characteristic],
-                                            x=dyssco.two_stage_characteristics['stage_one_growth_rate'],
-                                            y=dyssco.two_stage_characteristics['stage_two_growth_rate'],
-                                            showlegend=True), row+1, 1)
-                fig['layout']['yaxis' + str(row+1)]['title'] = 'Stage 2<br>Growth Rate(1/h)'
-                fig['layout']['xaxis' + str(row+1)]['title'] = 'Stage 1<br>Growth Rate(1/h)'
-                fig['layout']['xaxis' + str(row+1)]['ticks'] = 'outside'
-                fig['layout']['yaxis' + str(row+1)]['ticks'] = 'outside'
+                trace = go.Contour(z=dyssco.two_stage_characteristics[characteristic],
+                                   x=dyssco.two_stage_characteristics['stage_one_growth_rate'],
+                                   y=dyssco.two_stage_characteristics['stage_two_growth_rate'],
+                                   contours=dict(coloring='heatmap', showlabels=True,
+                                                 labelfont=dict(size=10, color='white')),
+                                   colorbar=dict(title=characteristic + '<br>' + units[row],
+                                                 titleside='right',
+                                                 titlefont=dict(size=14),
+                                                 nticks=15,
+                                                 ticks='outside',
+                                                 tickfont=dict(size=10),
+                                                 thickness=20,
+                                                 showticklabels=True,
+                                                 thicknessmode='pixels',
+                                                 len=1.05,
+                                                 lenmode='fraction',
+                                                 outlinewidth=1))
+                fig = go.Figure(data=[trace])
+                fig['layout']['yaxis']['title'] = 'Stage 2<br>Growth Rate(1/h)'
+                fig['layout']['xaxis']['title'] = 'Stage 1<br>Growth Rate(1/h)'
+                fig['layout']['xaxis']['ticks'] = 'outside'
+                fig['layout']['yaxis']['ticks'] = 'outside'
+                fig['layout']['height'] = 600
+                fig['layout']['width'] = 600
+                for item in fig['layout']['annotations']:
+                    item['font'] = dict(size=14)
+                fig['layout']['showlegend'] = True
+                fig['layout']['title'] = titlemaker(titles[row], 50)
 
+                plot(fig)
+        else:
+            warnings.warn('The given dyssco model does not contain two stage fermentations.')
 
-
-
-            fig['layout']['height'] = 1200
-            fig['layout']['width'] = 750
-            for item in fig['layout']['annotations']:
-                item['font'] = dict(size=14)
-            fig['layout']['showlegend'] = True
-            # fig['layout']['legend'] = dict(x=1, y=0.2)
-            # fig['layout']['annotations'][0]['y'] = 0.3
-            # fig['layout']['annotations'][0]['font'] = {'size': 16}
-
-            # optimal_batch = results['Constant Uptake Growth Uncoupled']['optimal_switch']
-
-            plot(fig)
+    else:
+        warnings.warn('The given object is not a tsdyssco object.')
