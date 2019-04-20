@@ -24,6 +24,14 @@ class TSDyssco(object):
         self.one_stage_fermentation_list = []
         self.two_stage_best_batch = None
         self.one_stage_best_batch = None
+        self.two_stage_characteristics = {'stage_one_growth_rate': [],
+                                          'stage_two_growth_rate': [],
+                                          'productivity': [],
+                                          'yield': [],
+                                          'titer': [],
+                                          'dupont_metric': [],
+                                          'objective_value': []}
+        self.one_stage_characteristics = {}
         for key in kwargs:
 
             if key in ['model', 'biomass_rxn', 'substrate_rxn', 'target_rxn', 'condition']:
@@ -71,6 +79,13 @@ class TSDyssco(object):
 
     def add_two_stage_fermentation(self, two_stage_fermentation):
         self.two_stage_fermentation_list.append(two_stage_fermentation)
+        self.two_stage_characteristics['stage_one_growth_rate'].append(two_stage_fermentation.stage_one_fluxes[0])
+        self.two_stage_characteristics['stage_two_growth_rate'].append(two_stage_fermentation.stage_two_fluxes[0])
+        self.two_stage_characteristics['productivity'].append(two_stage_fermentation.batch_productivity)
+        self.two_stage_characteristics['yield'].append(two_stage_fermentation.batch_yield)
+        self.two_stage_characteristics['titer'].append(two_stage_fermentation.batch_titer)
+        self.two_stage_characteristics['dupont_metric'].append(two_stage_fermentation.dupont_metric)
+        self.two_stage_characteristics['objective_value'].append(two_stage_fermentation.objective_value)
         if self.two_stage_best_batch is not None:
             if two_stage_fermentation.objective_value > self.two_stage_best_batch.objective_value:
                 self.two_stage_best_batch = two_stage_fermentation
@@ -124,5 +139,4 @@ class TSDyssco(object):
         else:
             warn("A production envelope could not be generated for the given model. This is likely due to missing"
                  "fields in the model.")
-
 
