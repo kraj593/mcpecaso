@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.integrate import odeint
 import warnings
+from .settings import settings
 
 
 def crop_dfba_timecourse_data(dfba_data, t):
@@ -57,7 +58,7 @@ def two_stage_timecourse(initial_concentrations, time_end, time_switch, two_stag
        Ensure t_switch < t_end
        two_stage_fluxes is a list of two lists that has flux data for biomass, substrate and product respectively"""
     
-    num_of_points = 1000
+    num_of_points = settings.num_timepoints
     stage_one_fluxes, stage_two_fluxes = two_stage_fluxes
     stage_one_start_data = initial_concentrations
     
