@@ -50,12 +50,12 @@ def get_colors(number_of_colors, colors=None, cl_scales=['9', 'qual', 'Set1']):
     return colors
 
 
-def titlemaker(title):
+def titlemaker(title, line_length):
     list_of_words = title.split()
     linetracker = ''
     new_title = ''
     for word in list_of_words:
-        if len(linetracker+word) < 20:
+        if len(linetracker+word) < line_length:
             new_title += word + ' '
             linetracker += word + ' '
         else:
@@ -94,7 +94,7 @@ def multiplot_envelopes(dyssco_list):
 
         if num_of_conditions <= 4:
             fig = tools.make_subplots(rows=3, cols=num_of_conditions,
-                                      subplot_titles=[titlemaker(condition) for condition in condition_list],
+                                      subplot_titles=[titlemaker(condition, 20) for condition in condition_list],
                                       vertical_spacing=0.07, print_grid=False)
 
             for col, condition in enumerate(envelope_dict):
@@ -269,7 +269,7 @@ def two_stage_fermentation_char_heatmap(dyssco):
                 fig.append_trace(go.Contour(z=dyssco.two_stage_characteristics[characteristic],
                                             x=dyssco.two_stage_characteristics['stage_one_growth_rate'],
                                             y=dyssco.two_stage_characteristics['stage_two_growth_rate'],
-                                            showlegend=True), row, 1)
+                                            showlegend=True), row+1, 1)
                 fig['layout']['yaxis' + str(row+1)]['title'] = 'Stage 2<br>Growth Rate(1/h)'
                 fig['layout']['xaxis' + str(row+1)]['title'] = 'Stage 1<br>Growth Rate(1/h)'
                 fig['layout']['xaxis' + str(row+1)]['ticks'] = 'outside'
