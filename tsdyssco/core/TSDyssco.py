@@ -29,8 +29,8 @@ class TSDyssco(object):
                                           'productivity': [],
                                           'yield': [],
                                           'titer': [],
-                                          'dupont_metric': [],
-                                          'objective_value': []}
+                                          'dupont metric': [],
+                                          'objective value': []}
         self.one_stage_characteristics = {}
         for key in kwargs:
 
@@ -84,8 +84,8 @@ class TSDyssco(object):
         self.two_stage_characteristics['productivity'].append(two_stage_fermentation.batch_productivity)
         self.two_stage_characteristics['yield'].append(two_stage_fermentation.batch_yield)
         self.two_stage_characteristics['titer'].append(two_stage_fermentation.batch_titer)
-        self.two_stage_characteristics['dupont_metric'].append(two_stage_fermentation.dupont_metric)
-        self.two_stage_characteristics['objective_value'].append(two_stage_fermentation.objective_value)
+        self.two_stage_characteristics['dupont metric'].append(two_stage_fermentation.dupont_metric)
+        self.two_stage_characteristics['objective value'].append(two_stage_fermentation.objective_value)
         if self.two_stage_best_batch is not None:
             if two_stage_fermentation.objective_value > self.two_stage_best_batch.objective_value:
                 self.two_stage_best_batch = two_stage_fermentation
