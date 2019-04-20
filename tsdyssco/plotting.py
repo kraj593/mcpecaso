@@ -268,33 +268,42 @@ def two_stage_char_contour(dyssco):
             target_metabolite = list(dyssco.target_rxn.metabolites.keys())[0].name
             characteristics = ['productivity', 'yield', 'titer', 'dupont metric', 'objective value']
             units = ['mmol/L.h', 'mmol product/mmol substrate', 'mmol/L', 'a.u.', 'a.u.']
-            titles = [str(target_metabolite) + ' ' + characteristic + " distribution for two stage fermentations in "
+            titles = [str(target_metabolite) + ' ' + characteristic + " distribution for two stage fermentation in "
                       + str(dyssco.model.id) for characteristic in characteristics]
             for row, characteristic in enumerate(characteristics):
                 trace = go.Contour(z=dyssco.two_stage_characteristics[characteristic],
                                    x=dyssco.two_stage_characteristics['stage_one_growth_rate'],
                                    y=dyssco.two_stage_characteristics['stage_two_growth_rate'],
+                                   ncontours=20,
                                    contours=dict(coloring='heatmap', showlabels=True,
-                                                 labelfont=dict(size=10, color='white')),
+                                                 labelfont=dict(size=12, color='white')),
                                    colorbar=dict(title=characteristic + '<br>' + units[row],
                                                  titleside='right',
                                                  titlefont=dict(size=14),
                                                  nticks=15,
                                                  ticks='outside',
-                                                 tickfont=dict(size=10),
-                                                 thickness=20,
+                                                 tickfont=dict(size=12),
+                                                 thickness=15,
                                                  showticklabels=True,
                                                  thicknessmode='pixels',
                                                  len=1.05,
                                                  lenmode='fraction',
                                                  outlinewidth=1))
                 fig = go.Figure(data=[trace])
+                fig['layout']['xaxis']['range'] = [0, np.around(((max(dyssco.two_stage_characteristics
+                                                                      ['stage_one_growth_rate']))+0.05), 1)]
+                fig['layout']['xaxis']['dtick'] = np.around((max(dyssco.two_stage_characteristics
+                                                                 ['stage_one_growth_rate'])) / 5, 2)
+                fig['layout']['yaxis']['range'] = [0, np.around(((max(dyssco.two_stage_characteristics
+                                                                      ['stage_two_growth_rate']))+0.05), 1)]
+                fig['layout']['yaxis']['dtick'] = np.around((max(dyssco.two_stage_characteristics
+                                                                 ['stage_two_growth_rate'])) / 5, 2)
                 fig['layout']['yaxis']['title'] = 'Stage 2<br>Growth Rate(1/h)'
                 fig['layout']['xaxis']['title'] = 'Stage 1<br>Growth Rate(1/h)'
                 fig['layout']['xaxis']['ticks'] = 'outside'
                 fig['layout']['yaxis']['ticks'] = 'outside'
-                fig['layout']['height'] = 600
-                fig['layout']['width'] = 600
+                fig['layout']['height'] = 500
+                fig['layout']['width'] = 500
                 for item in fig['layout']['annotations']:
                     item['font'] = dict(size=14)
                 fig['layout']['showlegend'] = True
