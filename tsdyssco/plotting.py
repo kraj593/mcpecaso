@@ -254,7 +254,7 @@ def plot_envelope(dyssco):
         warnings.warn('The given object is not a tsdyssco object.')
 
 
-def two_stage_fermentation_char_heatmap(dyssco):
+def two_stage_fermentation_char_contour(dyssco):
     if type(dyssco) == TSDyssco:
         ts_fermentations = dyssco.two_stage_fermentation_list
 
