@@ -3,7 +3,6 @@ from .two_stage_dfba import two_stage_timecourse, one_stage_timecourse
 from .fermentation_metrics import *
 from .settings import settings
 import numpy as np
-import warnings
 
 objective_dict = {'batch_productivity': batch_productivity,
                   'batch_yield': batch_yield,
@@ -30,7 +29,6 @@ class TwoStageFermentation(object):
         try:
             self.objective = objective_dict[settings.objective]
         except KeyError:
-            print("Invalid objective. Please check your tsdyssco objective in the settings file.")
             self.objective = objective_dict['batch_productivity']
 
         self.calculate_fermentation_data()
@@ -55,7 +53,6 @@ class TwoStageFermentation(object):
         try:
             self.objective_value = getattr(self, settings.objective)
         except AttributeError:
-            warnings.warn("Invalid objective. Please check your tsdyssco objective in the settings file.")
             self.objective_value = getattr(self, 'batch_productivity')
 
 
@@ -76,7 +73,6 @@ class OneStageFermentation(object):
         try:
             self.objective = objective_dict[settings.objective]
         except KeyError:
-            warnings.warn("Invalid objective. Please check your tsdyssco objective in the settings file.")
             self.objective = objective_dict['batch_productivity']
 
         self.calculate_fermentation_data()
@@ -94,5 +90,4 @@ class OneStageFermentation(object):
         try:
             self.objective_value = getattr(self, settings.objective)
         except AttributeError:
-            warnings.warn("Invalid objective. Please check your tsdyssco objective in the settings file.")
             self.objective_value = getattr(self, 'batch_productivity')
