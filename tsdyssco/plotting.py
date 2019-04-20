@@ -300,3 +300,64 @@ def two_stage_char_contour(dyssco):
 
     else:
         warnings.warn('The given object is not a tsdyssco object.')
+
+
+def multi_two_stage_char_contours(dyssco_list):
+    if sum([type(dyssco) == TSDyssco for dyssco in dyssco_list]) == len(dyssco_list):
+        ts_fermentations = dyssco.two_stage_fermentation_list
+
+        if ts_fermentations:
+            target_metabolite = list(dyssco.target_rxn.metabolites.keys())[0].name
+            characteristics = ['productivity', 'yield', 'titer', 'dupont metric', 'objective value']
+            units = ['mmol/L.h', 'mmol product/mmol substrate', 'mmol/L', 'a.u.', 'a.u.']
+            titles = [str(target_metabolite) + ' ' + characteristic + " distribution for two stage fermentations in "
+                      + str(dyssco.model.id) for characteristic in characteristics]
+            for row, characteristic in enumerate(characteristics):
+                max_characteristic = max(
+                    [max(dyssco.two_stage_characteristics[characteristic]) for dyssco in dyssco_list])
+                min_characteristic = min(
+                    [min(dyssco.two_stage_characteristics[characteristic]) for dyssco in dyssco_list])
+                fig = tools.make_subplots(rows=1, cols=len(dyssco_list),
+                                          subplot_titles=[dyssco.condition for dyssco in dyssco_list],
+                                          horizontal_spacing=0.07, print_grid=False)
+                for col, dyssco in enumerate(dyssco_list):
+                    fig.append_trace(go.Contour(z=dyssco.two_stage_characteristics[characteristic],
+                                                x=dyssco.two_stage_characteristics['stage_one_growth_rate'],
+                                                y=dyssco.two_stage_characteristics['stage_two_growth_rate'],
+                                                contours=dict(coloring='heatmap', showlabels=True,
+                                                              labelfont=dict(size=10, color='white')),
+                                                colorscale='RdBu',
+                                                colorbar=dict(title=characteristic + '<br>' + units[row],
+                                                              titleside='right',
+                                                              titlefont=dict(size=14),
+                                                              nticks=10,
+                                                              tick0=0,
+                                                              ticks='outside',
+                                                              tickfont=dict(size=10),
+                                                              thickness=20,
+                                                              showticklabels=True,
+                                                              thicknessmode='pixels',
+                                                              len=1.05,
+                                                              lenmode='fraction',
+                                                              outlinewidth=1),
+                                                zmin=min_characteristic, zmax=max_characteristic, ncontours=20), 1,
+                                     col + 1)
+
+                    fig['layout']['yaxis1']['title'] = 'Stage 2<br>Growth Rate(1/h)'
+                    fig['layout']['xaxis' + str(col + 1)]['title'] = 'Stage 1<br>Growth Rate(1/h)'
+                    fig['layout']['xaxis' + str(col + 1)]['ticks'] = 'outside'
+                    fig['layout']['yaxis' + str(col + 1)]['ticks'] = 'outside'
+                fig['layout']['height'] = 425
+                fig['layout']['width'] = 100 + len(dyssco_list) * 300
+                # for item in fig['layout']['annotations']:
+                #    item['font'] = dict(size=14)
+                # fig['layout']['showlegend'] = True
+                fig['layout']['title'] = titlemaker(titles[row], 50)
+
+                plot(fig)
+
+        else:
+            warnings.warn('The given dyssco model does not contain two stage fermentations.')
+
+    else:
+        warnings.warn('The given object is not a tsdyssco object.')
