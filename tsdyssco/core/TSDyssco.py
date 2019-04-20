@@ -21,6 +21,7 @@ class TSDyssco(object):
         self.model_complete_flag = False
         self.k_m = None
         self.two_stage_fermentation_list = []
+        self.one_stage_fermentation_list = []
         self.two_stage_best_batch = None
         self.one_stage_best_batch = None
         for key in kwargs:
@@ -68,7 +69,7 @@ class TSDyssco(object):
         else:
             warn("The production envelope could not be generated.")
 
-    def add_fermentation(self, two_stage_fermentation):
+    def add_two_stage_fermentation(self, two_stage_fermentation):
         self.two_stage_fermentation_list.append(two_stage_fermentation)
         if self.two_stage_best_batch is not None:
             if two_stage_fermentation.objective_value > self.two_stage_best_batch.objective_value:
@@ -76,7 +77,15 @@ class TSDyssco(object):
         else:
             self.two_stage_best_batch = two_stage_fermentation
 
-    def calculate_two_stage_characteristics(self):
+    def add_one_stage_fermentation(self, one_stage_fermentation):
+        self.one_stage_fermentation_list.append(one_stage_fermentation)
+        if self.one_stage_best_batch is not None:
+            if one_stage_fermentation.objective_value > self.one_stage_best_batch.objective_value:
+                self.one_stage_best_batch = one_stage_fermentation
+        else:
+            self.one_stage_best_batch = one_stage_fermentation
+
+    def calculate_fermentation_characteristics(self):
         if self.production_envelope is None:
             self.calculate_production_envelope()
         if self.production_envelope is not None:
@@ -89,6 +98,9 @@ class TSDyssco(object):
                 print('Starting parallel pool')
                 num_cores = multiprocessing.cpu_count()
                 start_time = time.time()
+                os_ferm_list = Parallel(n_jobs=num_cores, verbose=5)(
+                    delayed(OneStageFermentation)(flux_list[index])
+                    for index in range(len(flux_list)))
                 ts_ferm_list = Parallel(n_jobs=num_cores, verbose=5)(
                     delayed(TwoStageFermentation)(flux_list[stage_one_index], flux_list[stage_two_index])
                     for stage_one_index in range(len(flux_list))
@@ -96,6 +108,8 @@ class TSDyssco(object):
                 end_time = time.time()
             else:
                 start_time = time.time()
+                os_ferm_list = [OneStageFermentation(flux_list[index])
+                                for index in range(len(flux_list))]
                 ts_ferm_list = [TwoStageFermentation(flux_list[stage_one_index], flux_list[stage_two_index])
                                 for stage_one_index in range(len(flux_list))
                                 for stage_two_index in range(len(flux_list))]
@@ -103,7 +117,9 @@ class TSDyssco(object):
             time.sleep(0.5)
             print("Completed analysis in ", str(end_time-start_time), "s")
             for ts_ferm in ts_ferm_list:
-                self.add_fermentation(ts_ferm)
+                self.add_two_stage_fermentation(ts_ferm)
+            for os_ferm in os_ferm_list:
+                self.add_one_stage_fermentation(os_ferm)
 
         else:
             warn("A production envelope could not be generated for the given model. This is likely due to missing"
