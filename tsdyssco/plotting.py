@@ -95,7 +95,7 @@ def multiplot_envelopes(dyssco_list):
         if num_of_conditions <= 4:
             fig = tools.make_subplots(rows=3, cols=num_of_conditions,
                                       subplot_titles=[titlemaker(condition) for condition in condition_list],
-                                      vertical_spacing=0.07)
+                                      vertical_spacing=0.07, print_grid=False)
 
             for col, condition in enumerate(envelope_dict):
                 fig.append_trace(go.Scatter(x=envelope_dict[condition]['growth_rates'],
@@ -149,7 +149,8 @@ def multiplot_envelopes(dyssco_list):
                           " same graph for each item.")
 
         fig = tools.make_subplots(rows=1, cols=3, subplot_titles=
-                                  ['Substrate Uptake Rate', 'Product Flux', 'Product Yield'])
+                                  ['Substrate Uptake Rate', 'Product Flux', 'Product Yield'],
+                                  print_grid=False)
 
         for i, condition in enumerate(envelope_dict):
             fig.append_trace(go.Scatter(x=list(envelope_dict[condition]['growth_rates']),
@@ -196,8 +197,9 @@ def plot_envelope(dyssco):
         if envelope is not None:
             target_metabolite = list(dyssco.target_rxn.metabolites.keys())[0].name
             k_m = dyssco.k_m
-            fig = tools.make_subplots(rows=1, cols=3, subplot_titles=['Substrate Uptake Rate', 'Product Flux', 'Product Yield'],
-                                      horizontal_spacing=0.1)
+            fig = tools.make_subplots(rows=4, cols=1, subplot_titles=['Substrate Uptake Rate', 'Product Flux',
+                                                                      'Product Yield'],
+                                      horizontal_spacing=0.1, print_grid=False)
             colors = get_colors(1)
             fig.append_trace(go.Scatter(x=envelope['growth_rates'],
                                         y=envelope['substrate_uptake_rates'],
@@ -250,3 +252,41 @@ def plot_envelope(dyssco):
 
     else:
         warnings.warn('The given object is not a tsdyssco object.')
+
+
+def two_stage_fermentation_char_heatmap(dyssco):
+    if type(dyssco) == TSDyssco:
+        ts_fermentations = dyssco.two_stage_fermentation_list
+
+        if ts_fermentations:
+            target_metabolite = list(dyssco.target_rxn.metabolites.keys())[0].name
+            characteristics = ['productivity', 'yield', 'titer', 'dupont metric', 'objective value']
+            titles = [str(target_metabolite) + characteristic + " distributions for two stage fermentations in "
+                      + str(dyssco.model.id) for characteristic in characteristics]
+            fig = tools.make_subplots(rows=5, cols=1, subplot_titles=[title for title in titles],
+                                      print_grid=False)
+            for row, characteristic in enumerate(characteristics):
+                fig.append_trace(go.Contour(z=dyssco.two_stage_characteristics[characteristic],
+                                            x=dyssco.two_stage_characteristics['stage_one_growth_rate'],
+                                            y=dyssco.two_stage_characteristics['stage_two_growth_rate'],
+                                            showlegend=True), row, 1)
+                fig['layout']['yaxis' + str(row+1)]['title'] = 'Stage 2<br>Growth Rate(1/h)'
+                fig['layout']['xaxis' + str(row+1)]['title'] = 'Stage 1<br>Growth Rate(1/h)'
+                fig['layout']['xaxis' + str(row+1)]['ticks'] = 'outside'
+                fig['layout']['yaxis' + str(row+1)]['ticks'] = 'outside'
+
+
+
+
+            fig['layout']['height'] = 1200
+            fig['layout']['width'] = 750
+            for item in fig['layout']['annotations']:
+                item['font'] = dict(size=14)
+            fig['layout']['showlegend'] = True
+            # fig['layout']['legend'] = dict(x=1, y=0.2)
+            # fig['layout']['annotations'][0]['y'] = 0.3
+            # fig['layout']['annotations'][0]['font'] = {'size': 16}
+
+            # optimal_batch = results['Constant Uptake Growth Uncoupled']['optimal_switch']
+
+            plot(fig)
