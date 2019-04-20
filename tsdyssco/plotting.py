@@ -337,7 +337,6 @@ def multi_two_stage_char_contours(dyssco_list):
 
         ts_char_dict = {condition: dyssco.two_stage_characteristics
                         for condition, dyssco in zip(condition_list, dyssco_list)}
-        colors = get_colors(len(condition_list))
         max_stage_one_growth = max([max(ts_char['stage_one_growth_rate']) for ts_char in list(ts_char_dict.values())])
         max_stage_two_growth = max([max(ts_char['stage_two_growth_rate']) for ts_char in list(ts_char_dict.values())])
 
@@ -376,6 +375,17 @@ def multi_two_stage_char_contours(dyssco_list):
                                                               outlinewidth=1),
                                                 zmin=min_characteristic, zmax=max_characteristic, ncontours=20), 1,
                                      col + 1)
+                    fig['layout']['annotations'] = list(fig['layout']['annotations']) + \
+                                                   [go.layout.Annotation
+                                                    (dict(x=dyssco.two_stage_best_batch.stage_one_fluxes[0],
+                                                          y=dyssco.two_stage_best_batch.stage_two_fluxes[0],
+                                                          xref='x' + str(col + 1), yref='y' + str(col + 1),
+                                                          text=' ',
+                                                          showarrow=False, opacity=1,
+                                                          font=dict(color='#ffffff', size=1),
+                                                          bordercolor='#c7c7c7', borderwidth=0,
+                                                          borderpad=5, bgcolor='#4DAF4A', ax=-100, ay=-40))]
+
                     fig['layout']['xaxis'+str(col+1)]['range'] = [0, np.around((max_stage_one_growth + 0.05), 1)]
                     fig['layout']['xaxis'+str(col+1)]['dtick'] = np.around(max_stage_one_growth / 5, 2)
                     fig['layout']['yaxis'+str(col+1)]['range'] = [0, np.around((max_stage_two_growth + 0.05), 1)]
@@ -387,9 +397,6 @@ def multi_two_stage_char_contours(dyssco_list):
                     fig['layout']['yaxis' + str(col + 1)]['ticks'] = 'outside'
                 fig['layout']['height'] = 415
                 fig['layout']['width'] = 100 + len(dyssco_list) * 285
-                # for item in fig['layout']['annotations']:
-                #    item['font'] = dict(size=14)
-                # fig['layout']['showlegend'] = True
                 fig['layout']['title'] = titlemaker(titles[row], 100)
 
                 plot(fig)
