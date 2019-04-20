@@ -2,6 +2,7 @@ from .optimizer import optimal_switch_time
 from .two_stage_dfba import two_stage_timecourse, one_stage_timecourse
 from .fermentation_metrics import *
 from .settings import settings
+import numpy as np
 
 objective_dict = {'batch_productivity': batch_productivity,
                   'batch_yield': batch_yield,
@@ -73,7 +74,8 @@ class OneStageFermentation(object):
         self.calculate_fermentation_data()
 
     def calculate_fermentation_data(self):
-        self.data, self.time = one_stage_timecourse(self.initial_concentrations, self.time_end, self.fluxes)
+        self.time = np.linspace(0, self.time_end, settings.num_timepoints)
+        self.data, self.time = one_stage_timecourse(self.initial_concentrations, self.time, self.fluxes)
         self.time_end = self.time[-1]
         self.batch_productivity = batch_productivity(self.data, self.time)
         self.batch_yield = batch_yield(self.data, self.time)
