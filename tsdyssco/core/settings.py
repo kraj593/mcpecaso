@@ -13,6 +13,7 @@ class Settings:
         self.yield_coefficient = 0
         self.titer_coefficient = 0
         self.dupont_metric_coefficient = 0
+        settings.num_timepoints = 1000
 
 
 settings = Settings()
