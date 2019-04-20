@@ -95,7 +95,7 @@ def multiplot_envelopes(dyssco_list):
         if num_of_conditions <= 4:
             fig = tools.make_subplots(rows=3, cols=num_of_conditions,
                                       subplot_titles=[titlemaker(condition, 20) for condition in condition_list],
-                                      vertical_spacing=0.07, print_grid=False)
+                                      vertical_spacing=0.1, print_grid=False)
 
             for col, condition in enumerate(envelope_dict):
                 fig.append_trace(go.Scatter(x=envelope_dict[condition]['growth_rates'],
@@ -143,7 +143,7 @@ def multiplot_envelopes(dyssco_list):
             fig['layout']['showlegend'] = False
             fig['layout']['title'] = 'Production Characteristics'
             fig['layout']['height'] = 850
-            fig['layout']['width'] = 950
+            fig['layout']['width'] = 150 + num_of_conditions * 200
             plot(fig)
 
         else:
@@ -152,7 +152,7 @@ def multiplot_envelopes(dyssco_list):
 
         fig = tools.make_subplots(rows=1, cols=3, subplot_titles=
                                   ['Substrate Uptake Rate', 'Product Flux', 'Product Yield'],
-                                  print_grid=False)
+                                  print_grid=False, horizontal_spacing=0.1)
 
         for i, condition in enumerate(envelope_dict):
             fig.append_trace(go.Scatter(x=list(envelope_dict[condition]['growth_rates']),
@@ -174,9 +174,13 @@ def multiplot_envelopes(dyssco_list):
 
         for col in range(3):
             fig['layout']['xaxis'+str(col+1)]['ticks'] = 'outside'
-            fig['layout']['yaxis']['range'] = [0, 1.2*max_uptake]
             fig['layout']['yaxis'+str(col+1)]['ticks'] = 'outside'
             fig['layout']['xaxis'+str(col+1)]['title'] = 'Growth Rate (1/h)'
+            fig['layout']['xaxis' + str(col+1)]['range'] = [0, np.around((max_growth + 0.05), 1)]
+            fig['layout']['xaxis' + str(col+1)]['dtick'] = np.around(max_growth / 5, 2)
+        fig['layout']['yaxis1']['range'] = [0, 1.2 * max_uptake]
+        fig['layout']['yaxis2']['range'] = [0, 1.2 * max_flux]
+        fig['layout']['yaxis3']['range'] = [0, 1.2 * max_yield]
         fig['layout']['yaxis1']['title'] = 'Substrate Uptake<br>(mmol/gdw.h)'
         fig['layout']['yaxis2']['title'] = 'Product Flux<br>(mmol/gdw.h)'
         fig['layout']['yaxis3']['title'] = 'Product Yield<br>(mmol/mmol substrate)'
@@ -185,8 +189,8 @@ def multiplot_envelopes(dyssco_list):
         fig['layout']['legend']['y'] = -0.25
         fig['layout']['showlegend'] = True
         fig['layout']['title'] = 'Production Characteristics'
-        fig['layout']['height'] = 425
         fig['layout']['width'] = 950
+        fig['layout']['height'] = 425
         plot(fig)
 
     else:
@@ -199,7 +203,7 @@ def plot_envelope(dyssco):
         if envelope is not None:
             target_metabolite = list(dyssco.target_rxn.metabolites.keys())[0].name
             k_m = dyssco.k_m
-            fig = tools.make_subplots(rows=4, cols=1, subplot_titles=['Substrate Uptake Rate', 'Product Flux',
+            fig = tools.make_subplots(rows=1, cols=3, subplot_titles=['Substrate Uptake Rate', 'Product Flux',
                                                                       'Product Yield'],
                                       horizontal_spacing=0.1, print_grid=False)
             colors = get_colors(1)
