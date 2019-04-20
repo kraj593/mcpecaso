@@ -45,8 +45,11 @@ class TwoStageFermentation(object):
                                                     [self.stage_one_fluxes, self.stage_two_fluxes])
         self.time_end = self.time[-1]
         self.batch_productivity = batch_productivity(self.data, self.time)
+        self.batch_productivity = self.batch_productivity*(self.batch_productivity>0)
         self.batch_yield = batch_yield(self.data, self.time)
+        self.batch_yield = self.batch_yield*(self.batch_yield>0)
         self.batch_titer = batch_end_titer(self.data, self.time)
+        self.batch_titer = self.batch_titer*(self.batch_titer>0)
         self.dupont_metric = dupont_metric(self.data, self.time)
         self.linear_combination = linear_combination(self.data, self.time)
         try:
