@@ -2,7 +2,7 @@ import cobra
 from .settings import settings
 import pandas as pd
 from .substrate_dependent_envelopes import envelope_calculator
-from .TwoStageFermentation import *
+from .Fermentation import *
 from joblib import Parallel, delayed
 import multiprocessing
 import time
