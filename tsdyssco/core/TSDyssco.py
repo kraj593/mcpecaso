@@ -107,7 +107,7 @@ class TSDyssco(object):
         self.two_stage_characteristics['dupont metric'].append(two_stage_fermentation.dupont_metric)
         self.two_stage_characteristics['objective value'].append(two_stage_fermentation.objective_value)
         if (two_stage_fermentation.stage_one_fluxes[0] == max(self.production_envelope['growth_rates']) and
-           two_stage_fermentation.stage_one_fluxes[2] == max(self.production_envelope['production_rates_ub'])):
+           two_stage_fermentation.stage_two_fluxes[0] == min(self.production_envelope['growth_rates'])):
             self.two_stage_suboptimal_batch = two_stage_fermentation
         if self.two_stage_best_batch is not None:
             if two_stage_fermentation.objective_value > self.two_stage_best_batch.objective_value:
