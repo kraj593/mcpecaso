@@ -1,5 +1,4 @@
 import cobra
-from .settings import settings
 import pandas as pd
 from .substrate_dependent_envelopes import envelope_calculator
 from .Fermentation import *
@@ -7,6 +6,7 @@ from joblib import Parallel, delayed
 import multiprocessing
 import time
 import warnings
+from .settings import settings
 
 objective_dict = {'batch_productivity': 'productivity',
                   'batch_yield': 'yield',
@@ -128,18 +128,18 @@ class TSDyssco(object):
                 num_cores = multiprocessing.cpu_count()
                 start_time = time.time()
                 os_ferm_list = Parallel(n_jobs=num_cores, verbose=5)(
-                    delayed(OneStageFermentation)(flux_list[index])
+                    delayed(OneStageFermentation)(flux_list[index], settings)
                     for index in range(len(flux_list)))
                 ts_ferm_list = Parallel(n_jobs=num_cores, verbose=5)(
-                    delayed(TwoStageFermentation)(flux_list[stage_one_index], flux_list[stage_two_index])
+                    delayed(TwoStageFermentation)(flux_list[stage_one_index], flux_list[stage_two_index], settings)
                     for stage_one_index in range(len(flux_list))
                     for stage_two_index in range(len(flux_list)))
                 end_time = time.time()
             else:
                 start_time = time.time()
-                os_ferm_list = [OneStageFermentation(flux_list[index])
+                os_ferm_list = [OneStageFermentation(flux_list[index], settings)
                                 for index in range(len(flux_list))]
-                ts_ferm_list = [TwoStageFermentation(flux_list[stage_one_index], flux_list[stage_two_index])
+                ts_ferm_list = [TwoStageFermentation(flux_list[stage_one_index], flux_list[stage_two_index], settings)
                                 for stage_one_index in range(len(flux_list))
                                 for stage_two_index in range(len(flux_list))]
                 end_time = time.time()
