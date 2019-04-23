@@ -9,9 +9,9 @@ def crop_dfba_timecourse_data(dfba_data, t):
     """This function takes in dFBA data and timepoints and crops them to the point where substrate
     is over. dFBA data should be in the format: [[biomass,substrate,product]...] and timepoints are
     a list of timepoints."""
-    
-    if any(dfba_data[:, 1] <= 0):
-        substrate_consumed_index = np.where(dfba_data[:, 1] <= 0)[0][0]
+    np.warnings.filterwarnings('ignore')
+    if any(dfba_data[:, 1] < 0):
+        substrate_consumed_index = np.where(dfba_data[:, 1] < 0)[0][0]
     else:
         substrate_consumed_index = len(t) - 1
     return dfba_data[:substrate_consumed_index + 1], t[:substrate_consumed_index + 1]
@@ -23,7 +23,7 @@ def dfba_fun(concentrations, time, fluxes):
        The concentrations are in the order: [Biomass, Substrate, Products]"""
 
     dcdt = []
-    
+
     for i in range(len(concentrations)):
         if concentrations[1] > 0: 
             dcdt.append(concentrations[0]*fluxes[i])
