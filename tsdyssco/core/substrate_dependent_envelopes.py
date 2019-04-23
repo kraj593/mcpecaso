@@ -1,6 +1,4 @@
 import numpy as np
-import cameo,cobra
-import pandas as pd
 
 
 def growth_dependent_uptake(growth_rate, B=0):
