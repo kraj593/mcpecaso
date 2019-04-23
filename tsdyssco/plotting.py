@@ -266,31 +266,45 @@ def two_stage_char_contour(dyssco):
 
         if ts_fermentations:
             target_metabolite = list(dyssco.target_rxn.metabolites.keys())[0].name
+            attribute_names = ['batch_productivity', 'batch_yield', 'batch_titer',
+                               'dupont_metric', 'linear_combination']
             characteristics = ['productivity', 'yield', 'titer', 'dupont metric', 'objective value']
             units = ['(mmol/L.h)', '(mmol product/mmol substrate)', '(mmol/L)', '(a.u.)', '(a.u.)']
             titles = [str(target_metabolite) + ' ' + characteristic + " distribution for two stage fermentation in "
                       + str(dyssco.model.id) + '. Objective: ' + str(dyssco.objective_name)
                       for characteristic in characteristics]
             for row, characteristic in enumerate(characteristics):
-                trace = go.Contour(z=dyssco.two_stage_characteristics[characteristic],
-                                   x=dyssco.two_stage_characteristics['stage_one_growth_rate'],
-                                   y=dyssco.two_stage_characteristics['stage_two_growth_rate'],
-                                   ncontours=20,
-                                   contours=dict(coloring='heatmap', showlabels=True,
-                                                 labelfont=dict(size=12, color='white')),
-                                   colorbar=dict(title=characteristic.title() + '<br>' + units[row],
-                                                 titleside='right',
-                                                 titlefont=dict(size=14),
-                                                 nticks=15,
-                                                 ticks='outside',
-                                                 tickfont=dict(size=12),
-                                                 thickness=15,
-                                                 showticklabels=True,
-                                                 thicknessmode='pixels',
-                                                 len=1.05,
-                                                 lenmode='fraction',
-                                                 outlinewidth=1))
-                fig = go.Figure(data=[trace])
+                tracelist = list()
+                tracelist.append(go.Scatter(x=np.linspace(0, 1, 10), y=np.linspace(0, 1, 10), mode='lines',
+                                            line={'color': 'rgb(255,255,255)'}, showlegend=False))
+                tracelist.append(go.Contour(z=dyssco.two_stage_characteristics[characteristic],
+                                 x=dyssco.two_stage_characteristics['stage_one_growth_rate'],
+                                 y=dyssco.two_stage_characteristics['stage_two_growth_rate'],
+                                 ncontours=20,
+                                 contours=dict(coloring='heatmap', showlabels=True,
+                                               labelfont=dict(size=12, color='white')),
+                                 colorbar=dict(title=characteristic.title() + '<br>' + units[row],
+                                               titleside='right',
+                                               titlefont=dict(size=14),
+                                               nticks=15,
+                                               ticks='outside',
+                                               tickfont=dict(size=12),
+                                               thickness=15,
+                                               showticklabels=True,
+                                               thicknessmode='pixels',
+                                               len=1.05,
+                                               lenmode='fraction',
+                                               outlinewidth=1)))
+                tracelist.append(go.Scatter(x=[dyssco.two_stage_best_batch.stage_one_fluxes[0]],
+                                            y=[dyssco.two_stage_best_batch.stage_two_fluxes[0]],
+                                            mode='markers', hoverinfo='text', showlegend=False,
+                                            text=['Best Two Stage Point<br>' + characteristic.title() + ': ' +
+                                                  str(round(getattr(dyssco.two_stage_best_batch,
+                                                                    attribute_names[row]), 3))],
+                                            marker=dict(color='#4DAF4A',
+                                                        size=10)))
+
+                fig = go.Figure(data=tracelist)
                 fig['layout']['xaxis']['range'] = [0, np.around(((max(dyssco.two_stage_characteristics
                                                                       ['stage_one_growth_rate']))+0.05), 1)]
                 fig['layout']['xaxis']['dtick'] = np.around((max(dyssco.two_stage_characteristics
@@ -305,8 +319,6 @@ def two_stage_char_contour(dyssco):
                 fig['layout']['yaxis']['ticks'] = 'outside'
                 fig['layout']['height'] = 500
                 fig['layout']['width'] = 500
-                for item in fig['layout']['annotations']:
-                    item['font'] = dict(size=14)
                 fig['layout']['showlegend'] = True
                 fig['layout']['title'] = titlemaker(titles[row], 50)
 
