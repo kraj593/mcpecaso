@@ -40,6 +40,12 @@ class TSDyssco(object):
                                           'titer': [],
                                           'dupont metric': [],
                                           'objective value': []}
+        self.one_stage_characteristics = {'growth_rate': [],
+                                          'productivity': [],
+                                          'yield': [],
+                                          'titer': [],
+                                          'dupont metric': [],
+                                          'objective value': []}
         try:
             self.objective_name = objective_dict[settings.objective]
         except KeyError:
@@ -108,6 +114,12 @@ class TSDyssco(object):
 
     def add_one_stage_fermentation(self, one_stage_fermentation):
         self.one_stage_fermentation_list.append(one_stage_fermentation)
+        self.one_stage_characteristics['growth_rate'].append(one_stage_fermentation.fluxes[0])
+        self.one_stage_characteristics['productivity'].append(one_stage_fermentation.batch_productivity)
+        self.one_stage_characteristics['yield'].append(one_stage_fermentation.batch_yield)
+        self.one_stage_characteristics['titer'].append(one_stage_fermentation.batch_titer)
+        self.one_stage_characteristics['dupont metric'].append(one_stage_fermentation.dupont_metric)
+        self.one_stage_characteristics['objective value'].append(one_stage_fermentation.objective_value)
         if self.one_stage_best_batch is not None:
             if one_stage_fermentation.objective_value > self.one_stage_best_batch.objective_value:
                 self.one_stage_best_batch = one_stage_fermentation
