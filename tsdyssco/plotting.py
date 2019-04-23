@@ -280,6 +280,15 @@ def two_stage_char_contour(dyssco):
                 tracelist.append(go.Contour(z=dyssco.two_stage_characteristics[characteristic],
                                  x=dyssco.two_stage_characteristics['stage_one_growth_rate'],
                                  y=dyssco.two_stage_characteristics['stage_two_growth_rate'],
+                                 hoverinfo='text',
+                                 text=['Stage 1 growth rate: ' +
+                                       str(dyssco.two_stage_characteristics['stage_one_growth_rate'][i]) +
+                                       '<br>Stage 2 growth rate: ' +
+                                       str(dyssco.two_stage_characteristics['stage_two_growth_rate'][i]) +
+                                       '<br>' + characteristic.title() + ': ' +
+                                       str(round(dyssco.two_stage_characteristics[characteristic][i], 3))
+                                 for i in range(len(dyssco.two_stage_characteristics[characteristic]))],
+                                 showlegend=False,
                                  ncontours=20,
                                  contours=dict(coloring='heatmap', showlabels=True,
                                                labelfont=dict(size=12, color='white')),
@@ -334,7 +343,6 @@ def multi_two_stage_char_contours(dyssco_list):
     if sum([type(dyssco) == TSDyssco for dyssco in dyssco_list]) == len(dyssco_list):
         num_of_conditions = len(dyssco_list)
         condition_list = [dyssco.condition for dyssco in dyssco_list]
-
         if len(set(condition_list)) != len(condition_list):
             warnings.warn("You have duplicate conditions in your list of dyssco objects. Please ensure that the "
                           "conditions are unique in the list of dyssco objects and try again.")
@@ -353,10 +361,13 @@ def multi_two_stage_char_contours(dyssco_list):
         max_stage_two_growth = max([max(ts_char['stage_two_growth_rate']) for ts_char in list(ts_char_dict.values())])
 
         if num_of_conditions <= 3:
+            attribute_names = ['batch_productivity', 'batch_yield', 'batch_titer',
+                               'dupont_metric', 'linear_combination']
             characteristics = ['productivity', 'yield', 'titer', 'dupont metric', 'objective value']
             units = ['(mmol/L.h)', '(mmol product/mmol substrate)', '(mmol/L)', '(a.u.)', '(a.u.)']
             titles = [characteristic.title() + " distribution for two stage fermentation"
                       for characteristic in characteristics]
+
             for row, characteristic in enumerate(characteristics):
                 max_characteristic = max(
                     [max(dyssco.two_stage_characteristics[characteristic]) for dyssco in dyssco_list])
@@ -365,10 +376,32 @@ def multi_two_stage_char_contours(dyssco_list):
                 fig = tools.make_subplots(rows=1, cols=len(dyssco_list),
                                           subplot_titles=[dyssco.condition for dyssco in dyssco_list],
                                           horizontal_spacing=0.05, print_grid=False)
+
                 for col, dyssco in enumerate(dyssco_list):
+                    fig.append_trace(go.Scatter(x=np.linspace(0, 1, 10), y=np.linspace(0, 1, 10), mode='lines',
+                                                line={'color': 'rgb(255,255,255)'}, showlegend=False), 1, col+1)
+                    fig.append_trace(go.Scatter(x=[dyssco.two_stage_best_batch.stage_one_fluxes[0]],
+                                                y=[dyssco.two_stage_best_batch.stage_two_fluxes[0]],
+                                                mode='markers', hoverinfo='text', showlegend=False,
+                                                text=['Best Two Stage Point<br>' + characteristic.title() + ': ' +
+                                                      str(round(getattr(dyssco.two_stage_best_batch,
+                                                                        attribute_names[row]), 3))],
+                                                marker=dict(color='#4DAF4A',
+                                                            size=10)), 1, col+1)
                     fig.append_trace(go.Contour(z=dyssco.two_stage_characteristics[characteristic],
                                                 x=dyssco.two_stage_characteristics['stage_one_growth_rate'],
                                                 y=dyssco.two_stage_characteristics['stage_two_growth_rate'],
+                                                showlegend=False, hoverinfo='text',
+                                                text=['Stage 1 growth rate: ' +
+                                                      str(dyssco.two_stage_characteristics['stage_one_growth_rate'][
+                                                              i]) +
+                                                      '<br>Stage 2 growth rate: ' +
+                                                      str(dyssco.two_stage_characteristics['stage_two_growth_rate'][
+                                                              i]) +
+                                                      '<br>' + characteristic.title() + ': ' +
+                                                      str(round(dyssco.two_stage_characteristics[characteristic][i], 3))
+                                                      for i in
+                                                      range(len(dyssco.two_stage_characteristics[characteristic]))],
                                                 contours=dict(coloring='heatmap', showlabels=True,
                                                               labelfont=dict(size=12, color='white')),
                                                 colorscale='RdBu',
@@ -387,16 +420,6 @@ def multi_two_stage_char_contours(dyssco_list):
                                                               outlinewidth=1),
                                                 zmin=min_characteristic, zmax=max_characteristic, ncontours=20), 1,
                                      col + 1)
-                    fig['layout']['annotations'] = list(fig['layout']['annotations']) + \
-                                                   [go.layout.Annotation
-                                                    (dict(x=dyssco.two_stage_best_batch.stage_one_fluxes[0],
-                                                          y=dyssco.two_stage_best_batch.stage_two_fluxes[0],
-                                                          xref='x' + str(col + 1), yref='y' + str(col + 1),
-                                                          text=' ',
-                                                          showarrow=False, opacity=1,
-                                                          font=dict(color='#ffffff', size=1),
-                                                          bordercolor='#c7c7c7', borderwidth=0,
-                                                          borderpad=5, bgcolor='#4DAF4A', ax=-100, ay=-40))]
 
                     fig['layout']['xaxis'+str(col+1)]['range'] = [0, np.around((max_stage_one_growth + 0.05), 1)]
                     fig['layout']['xaxis'+str(col+1)]['dtick'] = np.around(max_stage_one_growth / 5, 2)
