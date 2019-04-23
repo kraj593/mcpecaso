@@ -4,15 +4,20 @@ from .settings import settings
 def batch_productivity(dfba_data, time):
     """ This function returns the productivity of a batch.
         Input dfba_data should be in the order [biomass, substrate, product]"""
-
-    return dfba_data[2, -1] / time[-1]
+    if time[-1] > 0:
+        return dfba_data[2, -1] / time[-1]
+    else:
+        return 0
 
 
 def batch_yield(dfba_data, time):
     """ This function returns the yield of a batch.
         Input dfba_data should be in the order [biomass, substrate, product]"""
-
-    return (dfba_data[2, -1] - dfba_data[2, 0]) / (dfba_data[1, 0] - dfba_data[1, -1])
+    sub_used = dfba_data[1, 0] - dfba_data[1, -1]
+    if sub_used > 0:
+        return (dfba_data[2, -1] - dfba_data[2, 0]) / sub_used
+    else:
+        return 0
 
 
 def batch_end_titer(dfba_data, time):
@@ -25,8 +30,11 @@ def batch_end_titer(dfba_data, time):
 def dupont_metric(dfba_data, time):
     """ This function returns the approximate dupont metric of a batch.
         Input dfba_data should be in the order [biomass, substrate, product]"""
-
-    return batch_productivity(dfba_data, time)*(1-1/batch_yield(dfba_data, time))
+    yd = batch_yield(dfba_data, time)
+    if yd > 0:
+        return batch_productivity(dfba_data, time)*(1-1/yd)
+    else:
+        return 0
 
 
 def linear_combination(dfba_data, time):
