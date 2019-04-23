@@ -51,7 +51,6 @@ class TSDyssco(object):
         except KeyError:
             warnings.warn("Please check your objective. The objective provided in the settings class isn't valid.")
             self.objective_name = objective_dict['batch_productivity']
-        self.one_stage_characteristics = {}
         for key in kwargs:
 
             if key in ['model', 'biomass_rxn', 'substrate_rxn', 'target_rxn', 'condition']:
