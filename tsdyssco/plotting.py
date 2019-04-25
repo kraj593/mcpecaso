@@ -511,3 +511,71 @@ def multi_two_stage_char_contours(dyssco_list):
 
     else:
         warnings.warn('One or more of the objects in this list are not Dyssco objects.')
+
+
+def plot_dyssco_dfba(dyssco):
+
+    if type(dyssco) == TSDyssco:
+        ts_fermentations = dyssco.two_stage_fermentation_list
+
+        if ts_fermentations:
+            ts_suboptimal = dyssco.two_stage_suboptimal_batch
+            os_best = dyssco.one_stage_best_batch
+            ts_best = dyssco.two_stage_best_batch
+            titles = ['Traditional Two Stage Batch', 'Best One Stage Batch', 'Best Two Stage Batch']
+            ferm_list = [ts_suboptimal, os_best, ts_best]
+            fig = tools.make_subplots(rows=1, cols=3, subplot_titles=[titlemaker(title, 25) for title in titles],
+                                      print_grid=False)
+            max_conc = max([(max([max(data) for data in ferm.data])) for ferm in ferm_list])
+            max_t = max([max(ferm.time) for ferm in ferm_list])
+            for col, ferm in enumerate(ferm_list):
+                fig.append_trace(go.Scatter(x=ferm.time, y=ferm.data[0], name='Biomass Concentration',
+                                            line={'color': '#d62728'}, legendgroup='Biomass',
+                                            showlegend=True if col == 2 else False, mode='lines'), 1, col+1)
+                fig.append_trace(go.Scatter(x=ferm.time, y=ferm.data[1], name='Substrate Concentration',
+                                            line={'color': '#1f77b4'}, legendgroup='Substrate',
+                                            showlegend=True if col == 2 else False, mode='lines'), 1, col + 1)
+                fig.append_trace(go.Scatter(x=ferm.time, y=ferm.data[2], name='Product Concentration',
+                                            line={'color': '#2ca02c'}, legendgroup='Product',
+                                            showlegend=True if col == 2 else False, mode='lines'), 1, col + 1)
+                if col != 1:
+                    fig.append_trace(go.Scatter(x=[ferm.optimal_switch_time]*30,
+                                                y=np.linspace(0, 0.8*max_conc, 30),
+                                                name='Optimal Switch Time', mode='lines',
+                                                line={'color': 'black',
+                                                        'width': 3,
+                                                        'dash': 'dot'},
+                                                showlegend=True if col == 2 else False), 1, col+1)
+                fig['layout']['xaxis'+str(col+1)]['range'] = [0, max_t]
+                fig['layout']['yaxis'+str(col+1)]['range'] = [0, 1.2*max_conc]
+                fig['layout']['annotations'] = list(fig['layout']['annotations']) + \
+                                               [go.layout.Annotation
+                                                (dict(x=max_t / 3,
+                                                      y=1.05*max_conc,
+                                                      xref='x'+str(col+1), yref='y'+str(col+1),
+                                                      text='Productivity=' + str(round(ferm.batch_productivity, 3)) +
+                                                      '<br>Yield=' + str(round(ferm.batch_yield, 3)) +
+                                                      '<br>End Titer=' + str(round(ferm.batch_titer,3)),
+                                                      showarrow=False,
+                                                      ax=-0, ay=-0))]
+                fig['layout']['xaxis'+str(col+1)]['title'] = 'Time (h)'
+
+            target_metabolite = list(dyssco.target_rxn.metabolites.keys())[0].name
+            fig['layout']['yaxis']['title'] = 'Concentration (mmol/L or g/L)'
+            fig['layout']['xaxis']['ticks'] = 'outside'
+            fig['layout']['yaxis']['ticks'] = 'outside'
+            fig['layout']['hovermode'] = 'closest'
+            fig['layout']['height'] = 500
+            fig['layout']['width'] = 1000
+            fig['layout']['showlegend'] = True
+            fig['layout']['legend']['x'] = 0
+            fig['layout']['legend']['y'] = -0.25
+            fig['layout']['legend']['orientation'] = 'h'
+            fig['layout']['title'] = 'Production Strategies for ' + target_metabolite + ' in ' + dyssco.model.id + \
+                                     '. Objective: ' + dyssco.objective_name.title()
+            plot(fig)
+        else:
+            warnings.warn('The given dyssco model does not contain two stage fermentations.')
+
+    else:
+        warnings.warn('The given object is not a tsdyssco object.')
