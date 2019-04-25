@@ -266,9 +266,18 @@ def two_stage_char_contour(dyssco):
 
         if ts_fermentations:
             target_metabolite = list(dyssco.target_rxn.metabolites.keys())[0].name
-            attribute_names = ['batch_productivity', 'batch_yield', 'batch_titer',
-                               'dupont_metric', 'linear_combination']
-            characteristics = ['productivity', 'yield', 'titer', 'dupont metric', 'objective value']
+            if dyssco.objective_name not in ['productivity', 'yield', 'titer', 'dupont metric']:
+
+                attribute_names = ['batch_productivity', 'batch_yield', 'batch_titer',
+                                   'dupont_metric', 'objective_value']
+                characteristics = ['productivity', 'yield', 'titer', 'dupont metric',
+                                   'objective value']
+            else:
+                attribute_names = ['batch_productivity', 'batch_yield', 'batch_titer',
+                                   'dupont_metric', 'linear_combination']
+                characteristics = ['productivity', 'yield', 'titer', 'dupont metric',
+                                   'objective value']
+
             units = ['(mmol/L.h)', '(mmol product/mmol substrate)', '(mmol/L)', '(a.u.)', '(a.u.)']
             titles = [str(target_metabolite) + ' ' + characteristic + " distribution for two stage fermentation in "
                       + str(dyssco.model.id) + '. Objective: ' + str(dyssco.objective_name)
@@ -395,9 +404,18 @@ def multi_two_stage_char_contours(dyssco_list):
         max_stage_two_growth = max([max(ts_char['stage_two_growth_rate']) for ts_char in list(ts_char_dict.values())])
 
         if num_of_conditions <= 3:
-            attribute_names = ['batch_productivity', 'batch_yield', 'batch_titer',
-                               'dupont_metric', 'linear_combination']
-            characteristics = ['productivity', 'yield', 'titer', 'dupont metric', 'objective value']
+            objective_list = [dyssco.objective_name for dyssco in dyssco_list]
+            if all([objective in ['productivity', 'yield', 'titer', 'dupont metric']
+                    for objective in objective_list]):
+                attribute_names = ['batch_productivity', 'batch_yield', 'batch_titer',
+                                   'dupont_metric', 'objective_value']
+                characteristics = ['productivity', 'yield', 'titer', 'dupont metric', 'objective value']
+
+            else:
+                attribute_names = ['batch_productivity', 'batch_yield', 'batch_titer',
+                                   'dupont_metric', 'linear_combination', 'objective_value']
+                characteristics = ['productivity', 'yield', 'titer', 'dupont metric', 'linear combination',
+                                   'objective value']
             units = ['(mmol/L.h)', '(mmol product/mmol substrate)', '(mmol/L)', '(a.u.)', '(a.u.)']
             titles = [characteristic.title() + " distribution for two stage fermentation"
                       for characteristic in characteristics]
