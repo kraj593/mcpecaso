@@ -42,13 +42,12 @@ def envelope_calculator(model, biomass_rxn, substrate_rxn, target_rxn, k_m=0, n_
             else:
                 production_rates_lb.append(sol_min.objective_value)
             sol_max = model.optimize(objective_sense='maximize')
-            production_rates_ub.append(model.optimize(objective_sense='maximize').objective_value)
             if model.solver.status != 'optimal':
                 print("Max Solver wasn't feasible for Growth Rate: ", growth_rate,
                       " with uptake rate: ", substrate_uptake_rate)
-                production_rates_lb.append(0)
+                production_rates_ub.append(0)
             else:
-                production_rates_lb.append(sol_max.objective_value)
+                production_rates_ub.append(sol_max.objective_value)
     yield_lb = list(np.divide(production_rates_lb, substrate_uptake_rates))
     yield_ub = list(np.divide(production_rates_ub, substrate_uptake_rates))
 
