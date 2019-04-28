@@ -18,7 +18,7 @@ def envelope_calculator(model, biomass_rxn, substrate_rxn, target_rxn, k_m=0, n_
     growth_rates = []
     substrate_uptake_rates = []
     substrate_uptake_max = -substrate_rxn.lower_bound
-    substrate_uptake_min = 2
+    substrate_uptake_min = 0.5
     max_growth = model.optimize().objective_value
 
     with model:
@@ -34,14 +34,21 @@ def envelope_calculator(model, biomass_rxn, substrate_rxn, target_rxn, k_m=0, n_
             model.objective = target_rxn.id
             growth_rates.append(growth_rate)
             substrate_uptake_rates.append(substrate_uptake_rate)
-            production_rates_lb.append(model.optimize(objective_sense='minimize').objective_value)
+            sol_min = model.optimize(objective_sense='minimize')
             if model.solver.status != 'optimal':
                 print("Min Solver wasn't feasible for Growth Rate: ", growth_rate,
                       " with uptake rate: ", substrate_uptake_rate)
+                production_rates_lb.append(0)
+            else:
+                production_rates_lb.append(sol_min.objective_value)
+            sol_max = model.optimize(objective_sense='maximize')
             production_rates_ub.append(model.optimize(objective_sense='maximize').objective_value)
             if model.solver.status != 'optimal':
                 print("Max Solver wasn't feasible for Growth Rate: ", growth_rate,
                       " with uptake rate: ", substrate_uptake_rate)
+                production_rates_lb.append(0)
+            else:
+                production_rates_lb.append(sol_max.objective_value)
     yield_lb = list(np.divide(production_rates_lb, substrate_uptake_rates))
     yield_ub = list(np.divide(production_rates_ub, substrate_uptake_rates))
 
