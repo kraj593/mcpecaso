@@ -8,15 +8,6 @@ import time
 import warnings
 from .settings import settings
 
-objective_dict = {'batch_productivity': 'productivity',
-                  'batch_yield': 'yield',
-                  'batch_titer': 'titer',
-                  'dupont_metric': 'dupont metric',
-                  'linear_combination': str(settings.productivity_coefficient) + ' * productivity + ' +
-                                        str(settings.yield_coefficient) + ' * yield + ' +
-                                        str(settings.titer_coefficient) + ' * titer + ' +
-                                        str(settings.dupont_metric_coefficient) + ' * dupont metric'}
-
 
 class TSDyssco(object):
 
@@ -47,6 +38,25 @@ class TSDyssco(object):
                                           'titer': [],
                                           'dupont metric': [],
                                           'objective value': []}
+
+        objective_name = ''
+        if settings.productivity_coefficient:
+            objective_name += str(settings.productivity_coefficient) + ' * productivity + '
+        if settings.yield_coefficient:
+            objective_name += str(settings.yield_coefficient) + ' * yield + '
+        if settings.titer_coefficient:
+            objective_name += str(settings.titer_coefficient) + ' * titer + '
+        if settings.dupont_metric_coefficient:
+            objective_name += str(settings.dupont_metric_coefficient) + ' * dupont metric + '
+        objective_name = objective_name.rstrip(" + ")
+
+        objective_dict = {'batch_productivity': 'productivity',
+                          'batch_yield': 'yield',
+                          'batch_titer': 'titer',
+                          'dupont_metric': 'dupont metric',
+                          'linear_combination': objective_name}
+
+
         try:
             self.objective_name = objective_dict[settings.objective]
         except KeyError:
