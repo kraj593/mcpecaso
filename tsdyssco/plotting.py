@@ -429,8 +429,8 @@ def multi_two_stage_char_contours(dyssco_list):
                                                                      ['stage_two_growth_rate']), 10), mode='lines',
                                                 name='One Stage Points',
                                                 line={'color': 'rgb(255, 218, 68)', 'dash': 'dash'},
-                                                showlegend=True if col == 2
-                                                else False, legendgroup='One Stage Points'), 1, col + 1)
+                                                showlegend=True if col == len(dyssco_list)-1 else False,
+                                                legendgroup='One Stage Points'), 1, col + 1)
                     fig.append_trace(go.Contour(z=dyssco.two_stage_characteristics[characteristic],
                                                 x=dyssco.two_stage_characteristics['stage_one_growth_rate'],
                                                 y=dyssco.two_stage_characteristics['stage_two_growth_rate'],
@@ -466,8 +466,8 @@ def multi_two_stage_char_contours(dyssco_list):
                     fig.append_trace(go.Scatter(x=[dyssco.one_stage_best_batch.fluxes[0]],
                                                 y=[dyssco.one_stage_best_batch.fluxes[0]],
                                                 name='Best One Stage Point',
-                                                mode='markers', hoverinfo='text', showlegend=True if col == 2
-                                                                                             else False,
+                                                mode='markers', hoverinfo='text',
+                                                showlegend=True if col == len(dyssco_list)-1 else False,
                                                 text=['Best One Stage Point<br>' + characteristic.title() + ': ' +
                                                       str(round(getattr(dyssco.one_stage_best_batch,
                                                                         attribute_names[row]), 3))],
@@ -477,8 +477,8 @@ def multi_two_stage_char_contours(dyssco_list):
                     fig.append_trace(go.Scatter(x=[dyssco.two_stage_suboptimal_batch.stage_one_fluxes[0]],
                                                 y=[dyssco.two_stage_suboptimal_batch.stage_two_fluxes[0]],
                                                 name='Max Growth to Min Growth Point',
-                                                mode='markers', hoverinfo='text', showlegend=True if col == 2
-                                                                                             else False,
+                                                mode='markers', hoverinfo='text',
+                                                showlegend=True if col == len(dyssco_list) - 1 else False,
                                                 text=['Max Growth to Min Growth Point<br>' +
                                                       characteristic.title() + ': ' +
                                                       str(round(getattr(dyssco.one_stage_best_batch,
@@ -488,8 +488,8 @@ def multi_two_stage_char_contours(dyssco_list):
                                                 legendgroup='Max Growth to Min Growth Point'), 1, col + 1)
                     fig.append_trace(go.Scatter(x=[dyssco.two_stage_best_batch.stage_one_fluxes[0]],
                                                 y=[dyssco.two_stage_best_batch.stage_two_fluxes[0]],
-                                                mode='markers', hoverinfo='text', showlegend=True if col == 2
-                                                                                             else False,
+                                                mode='markers', hoverinfo='text',
+                                                showlegend=True if col == len(dyssco_list) - 1 else False,
                                                 name='Best Two Stage Point',
                                                 text=['Best Two Stage Point<br>' + characteristic.title() + ': ' +
                                                       str(round(getattr(dyssco.two_stage_best_batch,
