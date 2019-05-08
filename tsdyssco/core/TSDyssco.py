@@ -13,9 +13,9 @@ objective_dict = {'batch_productivity': 'productivity',
                   'batch_titer': 'titer',
                   'dupont_metric': 'dupont metric',
                   'linear_combination': str(settings.productivity_coefficient) + ' * productivity + ' +
-                                        str(settings.productivity_coefficient) + ' * yield + ' +
-                                        str(settings.productivity_coefficient) + ' * titer + ' +
-                                        str(settings.productivity_coefficient) + ' * dupont metric'}
+                                        str(settings.yield_coefficient) + ' * yield + ' +
+                                        str(settings.titer_coefficient) + ' * titer + ' +
+                                        str(settings.dupont_metric_coefficient) + ' * dupont metric'}
 
 
 class TSDyssco(object):
