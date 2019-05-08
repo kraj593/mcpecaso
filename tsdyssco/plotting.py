@@ -404,18 +404,11 @@ def multi_two_stage_char_contours(dyssco_list):
         max_stage_two_growth = max([max(ts_char['stage_two_growth_rate']) for ts_char in list(ts_char_dict.values())])
 
         if num_of_conditions <= 3:
-            objective_list = [dyssco.objective_name for dyssco in dyssco_list]
-            if all([objective in ['productivity', 'yield', 'titer', 'dupont metric']
-                    for objective in objective_list]):
-                attribute_names = ['batch_productivity', 'batch_yield', 'batch_titer',
-                                   'dupont_metric', 'objective_value']
-                characteristics = ['productivity', 'yield', 'titer', 'dupont metric', 'objective value']
 
-            else:
-                attribute_names = ['batch_productivity', 'batch_yield', 'batch_titer',
-                                   'dupont_metric', 'linear_combination', 'objective_value']
-                characteristics = ['productivity', 'yield', 'titer', 'dupont metric', 'linear combination',
-                                   'objective value']
+            attribute_names = ['batch_productivity', 'batch_yield', 'batch_titer',
+                               'dupont_metric', 'objective_value']
+            characteristics = ['productivity', 'yield', 'titer', 'dupont metric',
+                               'objective value']
             units = ['(mmol/L.h)', '(mmol product/mmol substrate)', '(mmol/L)', '(a.u.)', '(a.u.)']
             titles = [characteristic.title() + " distribution for two stage fermentation"
                       for characteristic in characteristics]
@@ -548,13 +541,13 @@ def plot_dyssco_dfba(dyssco):
             max_t = max([max(ferm.time) for ferm in ferm_list])
             for col, ferm in enumerate(ferm_list):
                 fig.append_trace(go.Scatter(x=ferm.time, y=ferm.data[0], name='Biomass Concentration',
-                                            line={'color': '#d62728'}, legendgroup='Biomass',
+                                            line={'color': '#8c564b'}, legendgroup='Biomass',
                                             showlegend=True if col == 2 else False, mode='lines'), 1, col+1)
                 fig.append_trace(go.Scatter(x=ferm.time, y=ferm.data[1], name='Substrate Concentration',
                                             line={'color': '#1f77b4'}, legendgroup='Substrate',
                                             showlegend=True if col == 2 else False, mode='lines'), 1, col + 1)
                 fig.append_trace(go.Scatter(x=ferm.time, y=ferm.data[2], name='Product Concentration',
-                                            line={'color': '#2ca02c'}, legendgroup='Product',
+                                            line={'color': '#e377c2'}, legendgroup='Product',
                                             showlegend=True if col == 2 else False, mode='lines'), 1, col + 1)
                 if col != 1:
                     fig.append_trace(go.Scatter(x=[ferm.optimal_switch_time]*30,
