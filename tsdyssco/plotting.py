@@ -187,7 +187,10 @@ def multiplot_envelopes(dyssco_list):
         fig['layout']['legend']['orientation'] = 'h'
         fig['layout']['legend']['x'] = 0
         fig['layout']['legend']['y'] = -0.25
-        fig['layout']['showlegend'] = True
+        if num_of_conditions <= 7:
+            fig['layout']['showlegend'] = True
+        else:
+            fig['layout']['showlegend'] = False
         fig['layout']['title'] = 'Production Characteristics'
         fig['layout']['width'] = 950
         fig['layout']['height'] = 425
