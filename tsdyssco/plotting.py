@@ -44,7 +44,7 @@ def get_colors(number_of_colors, colors=None, cl_scales=['9', 'qual', 'Set1']):
             print('interpolated')
             colors = cl.interp(color_scale, 500)
             colors = [colors[int(x)] for x in np.arange(0, 500,
-                                                        round(500 / number_of_colors))]
+                                                        int(np.floor(500 / number_of_colors)))]
         else:
             colors = color_scale
     return colors
