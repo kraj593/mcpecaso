@@ -118,8 +118,8 @@ def multiplot_envelopes(dyssco_list):
                 for col in range(num_of_conditions):
                     fig['layout']['xaxis'+str(row*num_of_conditions+col+1)]['ticks'] = 'outside'
                     fig['layout']['yaxis'+str(row*num_of_conditions+col+1)]['ticks'] = 'outside'
-                    fig['layout']['xaxis' + str(row*num_of_conditions+col+1)]['range'] = [0, np.around((max_growth +
-                                                                                          0.05), 1)]
+                    fig['layout']['xaxis' + str(row*num_of_conditions+col+1)]['range'] = [0,
+                                                                                          np.ceil(max_growth/0.05)*0.05]
                     fig['layout']['xaxis' + str(row*num_of_conditions+col+1)]['dtick'] = np.around(max_growth / 5, 2)
 
                     if row == 0:
@@ -176,7 +176,7 @@ def multiplot_envelopes(dyssco_list):
             fig['layout']['xaxis'+str(col+1)]['ticks'] = 'outside'
             fig['layout']['yaxis'+str(col+1)]['ticks'] = 'outside'
             fig['layout']['xaxis'+str(col+1)]['title'] = 'Growth Rate (1/h)'
-            fig['layout']['xaxis' + str(col+1)]['range'] = [0, np.around((max_growth + 0.05), 1)]
+            fig['layout']['xaxis' + str(col+1)]['range'] = [0, np.ceil(max_growth/0.05)*0.05]
             fig['layout']['xaxis' + str(col+1)]['dtick'] = np.around(max_growth / 5, 2)
         fig['layout']['yaxis1']['range'] = [0, 1.2 * max_uptake]
         fig['layout']['yaxis2']['range'] = [0, 1.2 * max_flux]
@@ -234,8 +234,7 @@ def plot_envelope(dyssco):
                 fig['layout']['xaxis' + str(col + 1)]['zeroline'] = True
                 fig['layout']['yaxis' + str(col + 1)]['ticks'] = 'outside'
                 fig['layout']['xaxis' + str(col + 1)]['title'] = 'Growth Rate (1/h)'
-                fig['layout']['xaxis' + str(col + 1)]['range'] = [0, np.around(((max(envelope['growth_rates'])) +
-                                                                                0.05), 1)]
+                fig['layout']['xaxis' + str(col + 1)]['range'] = [0, np.ceil(max(envelope['growth_rates'])/0.05)*0.05]
                 fig['layout']['xaxis' + str(col + 1)]['dtick'] = np.around((max(envelope['growth_rates'])) / 5, 2)
                 fig['layout']['xaxis' + str(col + 1)]['tick0'] = 0
 
