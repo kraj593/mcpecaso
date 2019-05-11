@@ -356,12 +356,12 @@ def two_stage_char_contour(dyssco):
                                                         size=10)))
 
                 fig = go.Figure(data=tracelist)
-                fig['layout']['xaxis']['range'] = [0, np.around(((max(dyssco.two_stage_characteristics
-                                                                      ['stage_one_growth_rate']))+0.05), 1)]
+                fig['layout']['xaxis']['range'] = [0, np.ceil(max(dyssco.two_stage_characteristics
+                                                                  ['stage_one_growth_rate'])/0.05)*0.05]
                 fig['layout']['xaxis']['dtick'] = np.around((max(dyssco.two_stage_characteristics
                                                                  ['stage_one_growth_rate'])) / 5, 2)
-                fig['layout']['yaxis']['range'] = [0, np.around(((max(dyssco.two_stage_characteristics
-                                                                      ['stage_two_growth_rate']))+0.05), 1)]
+                fig['layout']['yaxis']['range'] = [0, np.ceil(max(dyssco.two_stage_characteristics
+                                                                  ['stage_two_growth_rate'])/0.05)*0.05]
                 fig['layout']['yaxis']['dtick'] = np.around((max(dyssco.two_stage_characteristics
                                                                  ['stage_two_growth_rate'])) / 5, 2)
                 fig['layout']['yaxis']['title'] = 'Stage 2 Growth Rate<br>(1/h)'
@@ -501,9 +501,9 @@ def multi_two_stage_char_contours(dyssco_list):
                                                             size=10),
                                                 legendgroup='Best Two Stage Point'), 1, col + 1)
 
-                    fig['layout']['xaxis'+str(col+1)]['range'] = [0, np.around((max_stage_one_growth + 0.05), 1)]
+                    fig['layout']['xaxis'+str(col+1)]['range'] = [0, np.ceil(max_stage_one_growth/0.05)*0.05]
                     fig['layout']['xaxis'+str(col+1)]['dtick'] = np.around(max_stage_one_growth / 5, 2)
-                    fig['layout']['yaxis'+str(col+1)]['range'] = [0, np.around((max_stage_two_growth + 0.05), 1)]
+                    fig['layout']['yaxis'+str(col+1)]['range'] = [0, np.ceil(max_stage_two_growth/0.05)*0.05]
                     fig['layout']['yaxis'+str(col+1)]['dtick'] = np.around(max_stage_two_growth / 5, 2)
 
                     fig['layout']['yaxis1']['title'] = 'Stage 2<br>Growth Rate(1/h)'
