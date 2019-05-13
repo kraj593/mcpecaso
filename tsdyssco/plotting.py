@@ -349,7 +349,7 @@ def two_stage_char_contour(dyssco):
                                             mode='markers', hoverinfo='text', showlegend=True,
                                             text=['Max Growth to Min Growth Point<br>' +
                                                   characteristic.title() + ': ' +
-                                                  str(round(getattr(dyssco.one_stage_best_batch,
+                                                  str(round(getattr(dyssco.two_stage_suboptimal_batch,
                                                                     attribute_names[row]), 3))],
                                             marker=dict(color='rgb(255, 0, 0)',
                                                         size=10)))
@@ -483,7 +483,7 @@ def multi_two_stage_char_contours(dyssco_list):
                                                 showlegend=True if col == len(dyssco_list) - 1 else False,
                                                 text=['Max Growth to Min Growth Point<br>' +
                                                       characteristic.title() + ': ' +
-                                                      str(round(getattr(dyssco.one_stage_best_batch,
+                                                      str(round(getattr(dyssco.two_stage_suboptimal_batch,
                                                                         attribute_names[row]), 3))],
                                                 marker=dict(color='rgb(255, 0, 0)',
                                                             size=10),
