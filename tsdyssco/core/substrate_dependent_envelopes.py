@@ -1,4 +1,5 @@
 import numpy as np
+from .settings import settings
 
 
 def growth_dependent_uptake(growth_rate, B=0):
@@ -18,7 +19,7 @@ def envelope_calculator(model, biomass_rxn, substrate_rxn, target_rxn, k_m=0, n_
     growth_rates = []
     substrate_uptake_rates = []
     substrate_uptake_max = -substrate_rxn.lower_bound
-    substrate_uptake_min = 0.5
+    substrate_uptake_min = settings.substrate_uptake_start
     max_growth = model.optimize().objective_value
 
     with model:
