@@ -4,7 +4,7 @@ from.two_stage_dfba import *
 
 
 def optimization_target(time_switch, initial_concentrations, time_end, two_stage_fluxes, objective_fun, settings):
-    data, time = two_stage_timecourse(initial_concentrations, time_end, time_switch, two_stage_fluxes,
+    data, time = two_stage_timecourse(initial_concentrations, time_end, *list(time_switch), two_stage_fluxes,
                                       settings.num_timepoints)
     return -objective_fun(data, time, settings)
 
@@ -15,7 +15,7 @@ def optimal_switch_time(initial_concentrations, time_end, two_stage_fluxes, sett
                           args=(initial_concentrations, time_end, two_stage_fluxes, objective_fun, settings),
                           options={'maxiter': 1000000}, method='COBYLA')
 
-    temp_data, temp_time = two_stage_timecourse(initial_concentrations, time_end, opt_result.x, two_stage_fluxes,
+    temp_data, temp_time = two_stage_timecourse(initial_concentrations, time_end, opt_result.x[0], two_stage_fluxes,
                                                 settings.num_timepoints)
 
     if opt_result.x[0] <= 0:
