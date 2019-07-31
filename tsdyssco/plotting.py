@@ -195,6 +195,7 @@ def multiplot_envelopes(dyssco_list):
         fig['layout']['width'] = 950
         fig['layout']['height'] = 425
         plot(fig)
+        return fig
 
     else:
         warnings.warn('The given object is not a tsdyssco object.')
@@ -254,6 +255,7 @@ def plot_envelope(dyssco):
             fig['layout']['width'] = 950
 
             plot(fig)
+            return fig
 
         else:
             warnings.warn('The given dyssco model does not contain a production envelope.')
@@ -284,6 +286,7 @@ def two_stage_char_contour(dyssco):
             titles = [str(target_metabolite) + ' ' + characteristic + " distribution for two stage fermentation in "
                       + str(dyssco.model.id) + '. Objective: ' + str(dyssco.objective_name)
                       for characteristic in characteristics]
+            fig_list = []
             for row, characteristic in enumerate(characteristics):
                 tracelist = list()
                 tracelist.append(go.Scatter(x=np.linspace(0, max(dyssco.two_stage_characteristics
@@ -377,6 +380,9 @@ def two_stage_char_contour(dyssco):
                 fig['layout']['title'] = titlemaker(titles[row], 50)
 
                 plot(fig)
+                fig_list.append(fig)
+
+            return tuple(fig_list)
         else:
             warnings.warn('The given dyssco model does not contain two stage fermentations.')
 
@@ -414,6 +420,8 @@ def multi_two_stage_char_contours(dyssco_list):
             units = ['(mmol/L.h)', '(mmol product/mmol substrate)', '(mmol/L)', '(a.u.)', '(a.u.)']
             titles = [characteristic.title() + " distribution for two stage fermentation"
                       for characteristic in characteristics]
+
+            fig_list = []
 
             for row, characteristic in enumerate(characteristics):
                 max_characteristic = max(
@@ -517,7 +525,9 @@ def multi_two_stage_char_contours(dyssco_list):
                 fig['layout']['legend']['x'] = 0
                 fig['layout']['legend']['y'] = -0.45
                 plot(fig)
+                fig_list.append(fig)
 
+            return tuple(fig_list)
         else:
             warnings.warn('There are too many dyssco objects in this list. This function can handle a maximum of 3'
                           ' objects')
@@ -572,11 +582,11 @@ def plot_dyssco_dfba(dyssco):
                                                       showarrow=False,
                                                       ax=-0, ay=-0))]
                 fig['layout']['xaxis'+str(col+1)]['title'] = 'Time (h)'
+                fig['layout']['xaxis'+str(col+1)]['ticks'] = 'outside'
+                fig['layout']['yaxis'+str(col+1)]['ticks'] = 'outside'
 
             target_metabolite = list(dyssco.target_rxn.metabolites.keys())[0].name
             fig['layout']['yaxis']['title'] = 'Concentration (mmol/L or g/L)'
-            fig['layout']['xaxis']['ticks'] = 'outside'
-            fig['layout']['yaxis']['ticks'] = 'outside'
             fig['layout']['hovermode'] = 'closest'
             fig['layout']['height'] = 500
             fig['layout']['width'] = 1000
@@ -587,6 +597,7 @@ def plot_dyssco_dfba(dyssco):
             fig['layout']['title'] = 'Production Strategies for ' + target_metabolite + ' in ' + dyssco.model.id + \
                                      '. Objective: ' + dyssco.objective_name.title()
             plot(fig)
+            return fig
         else:
             warnings.warn('The given dyssco model does not contain two stage fermentations.')
 
