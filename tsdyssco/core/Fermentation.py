@@ -6,7 +6,6 @@ import numpy as np
 objective_dict = {'batch_productivity': batch_productivity,
                   'batch_yield': batch_yield,
                   'batch_titer': batch_end_titer,
-                  'dupont_metric': dupont_metric,
                   'linear_combination': linear_combination}
 
 
@@ -24,7 +23,6 @@ class TwoStageFermentation(object):
         self.batch_yield = None
         self.batch_productivity = None
         self.batch_titer = None
-        self.dupont_metric = None
         self.linear_combination = None
         self.objective_value = None
         try:
@@ -50,7 +48,6 @@ class TwoStageFermentation(object):
         self.batch_yield = self.batch_yield*(self.batch_yield > 0)
         self.batch_titer = batch_end_titer(self.data, self.time, self.settings)
         self.batch_titer = self.batch_titer*(self.batch_titer > 0)
-        self.dupont_metric = dupont_metric(self.data, self.time, self.settings)
         self.linear_combination = linear_combination(self.data, self.time, self.settings)
         try:
             self.objective_value = getattr(self, self.settings.objective)
@@ -71,7 +68,6 @@ class OneStageFermentation(object):
         self.batch_yield = None
         self.batch_productivity = None
         self.batch_titer = None
-        self.dupont_metric = None
         self.linear_combination = None
         self.objective_value = None
         try:
@@ -88,7 +84,6 @@ class OneStageFermentation(object):
         self.batch_productivity = batch_productivity(self.data, self.time, self.settings)
         self.batch_yield = batch_yield(self.data, self.time, self.settings)
         self.batch_titer = batch_end_titer(self.data, self.time, self.settings)
-        self.dupont_metric = dupont_metric(self.data, self.time, self.settings)
         self.linear_combination = linear_combination(self.data, self.time, self.settings)
         self.objective_value = getattr(self, self.settings.objective)
         try:

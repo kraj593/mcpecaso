@@ -30,13 +30,11 @@ class TSDyssco(object):
                                           'productivity': [],
                                           'yield': [],
                                           'titer': [],
-                                          'dupont metric': [],
                                           'objective value': []}
         self.one_stage_characteristics = {'growth_rate': [],
                                           'productivity': [],
                                           'yield': [],
                                           'titer': [],
-                                          'dupont metric': [],
                                           'objective value': []}
 
         objective_name = ''
@@ -46,14 +44,11 @@ class TSDyssco(object):
             objective_name += str(settings.yield_coefficient) + ' * yield + '
         if settings.titer_coefficient:
             objective_name += str(settings.titer_coefficient) + ' * titer + '
-        if settings.dupont_metric_coefficient:
-            objective_name += str(settings.dupont_metric_coefficient) + ' * dupont metric + '
         objective_name = objective_name.rstrip(" + ")
 
         objective_dict = {'batch_productivity': 'productivity',
                           'batch_yield': 'yield',
                           'batch_titer': 'titer',
-                          'dupont_metric': 'dupont metric',
                           'linear_combination': objective_name}
 
 
@@ -114,7 +109,6 @@ class TSDyssco(object):
         self.two_stage_characteristics['productivity'].append(two_stage_fermentation.batch_productivity)
         self.two_stage_characteristics['yield'].append(two_stage_fermentation.batch_yield)
         self.two_stage_characteristics['titer'].append(two_stage_fermentation.batch_titer)
-        self.two_stage_characteristics['dupont metric'].append(two_stage_fermentation.dupont_metric)
         self.two_stage_characteristics['objective value'].append(two_stage_fermentation.objective_value)
         if (two_stage_fermentation.stage_one_fluxes[0] == max(self.production_envelope['growth_rates']) and
            two_stage_fermentation.stage_two_fluxes[0] == min(self.production_envelope['growth_rates'])):
@@ -131,7 +125,6 @@ class TSDyssco(object):
         self.one_stage_characteristics['productivity'].append(one_stage_fermentation.batch_productivity)
         self.one_stage_characteristics['yield'].append(one_stage_fermentation.batch_yield)
         self.one_stage_characteristics['titer'].append(one_stage_fermentation.batch_titer)
-        self.one_stage_characteristics['dupont metric'].append(one_stage_fermentation.dupont_metric)
         self.one_stage_characteristics['objective value'].append(one_stage_fermentation.objective_value)
         if self.one_stage_best_batch is not None:
             if one_stage_fermentation.objective_value > self.one_stage_best_batch.objective_value:
