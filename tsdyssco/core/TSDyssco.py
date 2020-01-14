@@ -25,6 +25,8 @@ class TSDyssco(object):
         self.two_stage_suboptimal_batch = None
         self.two_stage_best_batch = None
         self.one_stage_best_batch = None
+        self.one_stage_constraint_flag = True
+        self.two_stage_constraint_flag = True
         self.two_stage_characteristics = {'stage_one_growth_rate': [],
                                           'stage_two_growth_rate': [],
                                           'productivity': [],
@@ -110,6 +112,11 @@ class TSDyssco(object):
         self.two_stage_characteristics['yield'].append(two_stage_fermentation.batch_yield)
         self.two_stage_characteristics['titer'].append(two_stage_fermentation.batch_titer)
         self.two_stage_characteristics['objective value'].append(two_stage_fermentation.objective_value)
+        if not two_stage_fermentation.constraint_flag:
+            self.two_stage_constraint_flag = False
+            warnings.warn("The constraints set for the fermentation metrics could not be met for one or more two stage"
+                          "fermentation batches. The fermentation metrics for these batches have been set to zero."
+                          "Consider reducing or removing the constraints to resolve this issue.")
         if (two_stage_fermentation.stage_one_fluxes[0] == max(self.production_envelope['growth_rates']) and
            two_stage_fermentation.stage_two_fluxes[0] == min(self.production_envelope['growth_rates'])):
             self.two_stage_suboptimal_batch = two_stage_fermentation
@@ -126,6 +133,11 @@ class TSDyssco(object):
         self.one_stage_characteristics['yield'].append(one_stage_fermentation.batch_yield)
         self.one_stage_characteristics['titer'].append(one_stage_fermentation.batch_titer)
         self.one_stage_characteristics['objective value'].append(one_stage_fermentation.objective_value)
+        if not one_stage_fermentation.constraint_flag:
+            self.one_stage_constraint_flag = False
+            warnings.warn("The constraints set for the fermentation metrics could not be met for one or more one stage"
+                          "fermentation batches. The fermentation metrics for these batches have been set to zero."
+                          "Consider reducing or removing the constraints to resolve this issue.")
         if self.one_stage_best_batch is not None:
             if one_stage_fermentation.objective_value > self.one_stage_best_batch.objective_value:
                 self.one_stage_best_batch = one_stage_fermentation
