@@ -41,20 +41,14 @@ class TwoStageFermentation(object):
                                          [self.stage_one_fluxes, self.stage_two_fluxes], self.settings,
                                          self.objective, self.productivity_constraint, self.yield_constraint,
                                          self.titer_constraint)
-        if opt_result.success:
-            self.optimal_switch_time = opt_result.x[0]
-            self.data, self.time = two_stage_timecourse(self.initial_concentrations, self.time_end,
-                                                        self.optimal_switch_time,
-                                                        [self.stage_one_fluxes, self.stage_two_fluxes],
-                                                        num_of_points=self.settings.num_timepoints)
-        else:
+        if not opt_result.success:
             self.constraint_flag = False
-            self.optimal_switch_time = 0
-            self.data, self.time = two_stage_timecourse(self.initial_concentrations, 0,
-                                                        self.optimal_switch_time,
-                                                        [self.stage_one_fluxes, self.stage_two_fluxes],
-                                                        num_of_points=self.settings.num_timepoints)
 
+        self.optimal_switch_time = opt_result.x[0]
+        self.data, self.time = two_stage_timecourse(self.initial_concentrations, self.time_end,
+                                                    self.optimal_switch_time,
+                                                    [self.stage_one_fluxes, self.stage_two_fluxes],
+                                                    num_of_points=self.settings.num_timepoints)
         self.time_end = self.time[-1]
         self.batch_productivity = batch_productivity(self.data, self.time, self.settings)
         self.batch_productivity = self.batch_productivity*(self.batch_productivity > 0)
@@ -107,11 +101,6 @@ class OneStageFermentation(object):
                (self.batch_yield >= self.yield_constraint) and
                (self.batch_titer >= self.titer_constraint)):
             self.constraint_flag = False
-            self.data, self.time = one_stage_timecourse(self.initial_concentrations, [0], self.fluxes)
-            self.time_end = self.time[-1]
-            self.batch_productivity = batch_productivity(self.data, self.time, self.settings)
-            self.batch_yield = batch_yield(self.data, self.time, self.settings)
-            self.batch_titer = batch_end_titer(self.data, self.time, self.settings)
 
         self.linear_combination = linear_combination(self.data, self.time, self.settings)
         try:
