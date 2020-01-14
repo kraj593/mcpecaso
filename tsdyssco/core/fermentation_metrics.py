@@ -29,5 +29,4 @@ def linear_combination(dfba_data, time, settings):
         objective function. Input dfba_data should be in the order [biomass, substrate, product]"""
     return settings.productivity_coefficient*batch_productivity(dfba_data, time, settings) + \
         settings.yield_coefficient*batch_yield(dfba_data, time, settings) + \
-        settings.titer_coefficient*batch_end_titer(dfba_data, time, settings) + \
-        settings.dupont_metric_coefficient*dupont_metric(dfba_data, time, settings)
+        settings.titer_coefficient*batch_end_titer(dfba_data, time, settings)
