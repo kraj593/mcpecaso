@@ -58,7 +58,11 @@ def two_stage_timecourse(initial_concentrations, time_end, time_switch, two_stag
        two_stage_fluxes is a list of two lists that has flux data for biomass, substrate and product respectively"""
     stage_one_fluxes, stage_two_fluxes = two_stage_fluxes
     stage_one_start_data = initial_concentrations
-    
+
+    if time_end <= 0:
+        two_stage_data, time = one_stage_timecourse(stage_one_start_data, [0], stage_one_fluxes)
+        return two_stage_data, time
+
     # These two conditions are to ensure that the optimizer functions properly
     if time_switch > time_end:
         time_switch = time_end
