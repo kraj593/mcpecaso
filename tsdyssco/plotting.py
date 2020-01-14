@@ -270,19 +270,15 @@ def two_stage_char_contour(dyssco):
 
         if ts_fermentations:
             target_metabolite = list(dyssco.target_rxn.metabolites.keys())[0].name
-            if dyssco.objective_name not in ['productivity', 'yield', 'titer', 'dupont metric']:
+            if dyssco.objective_name not in ['productivity', 'yield', 'titer']:
 
-                attribute_names = ['batch_productivity', 'batch_yield', 'batch_titer',
-                                   'dupont_metric', 'objective_value']
-                characteristics = ['productivity', 'yield', 'titer', 'dupont metric',
-                                   'objective value']
+                attribute_names = ['batch_productivity', 'batch_yield', 'batch_titer', 'objective_value']
+                characteristics = ['productivity', 'yield', 'titer', 'objective value']
             else:
-                attribute_names = ['batch_productivity', 'batch_yield', 'batch_titer',
-                                   'dupont_metric', 'linear_combination']
-                characteristics = ['productivity', 'yield', 'titer', 'dupont metric',
-                                   'objective value']
+                attribute_names = ['batch_productivity', 'batch_yield', 'batch_titer', 'linear_combination']
+                characteristics = ['productivity', 'yield', 'titer', 'objective value']
 
-            units = ['(mmol/L.h)', '(mmol product/mmol substrate)', '(mmol/L)', '(a.u.)', '(a.u.)']
+            units = ['(mmol/L.h)', '(mmol product/mmol substrate)', '(mmol/L)', '(a.u.)']
             titles = [str(target_metabolite) + ' ' + characteristic + " distribution for two stage fermentation in "
                       + str(dyssco.model.id) + '. Objective: ' + str(dyssco.objective_name)
                       for characteristic in characteristics]
@@ -413,11 +409,9 @@ def multi_two_stage_char_contours(dyssco_list):
 
         if num_of_conditions <= 3:
 
-            attribute_names = ['batch_productivity', 'batch_yield', 'batch_titer',
-                               'dupont_metric', 'objective_value']
-            characteristics = ['productivity', 'yield', 'titer', 'dupont metric',
-                               'objective value']
-            units = ['(mmol/L.h)', '(mmol product/mmol substrate)', '(mmol/L)', '(a.u.)', '(a.u.)']
+            attribute_names = ['batch_productivity', 'batch_yield', 'batch_titer', 'objective_value']
+            characteristics = ['productivity', 'yield', 'titer', 'objective value']
+            units = ['(mmol/L.h)', '(mmol product/mmol substrate)', '(mmol/L)', '(a.u.)']
             titles = [characteristic.title() + " distribution for two stage fermentation"
                       for characteristic in characteristics]
 
