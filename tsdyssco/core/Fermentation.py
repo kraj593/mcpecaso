@@ -19,6 +19,9 @@ class TwoStageFermentation(object):
         self.time_end = self.settings.time_end
         self.data = []
         self.time = []
+        self.productivity_constraint = settings.productivity_constraint
+        self.yield_constraint = settings.yield_constraint
+        self.titer_constraint = settings.titer_constraint
         self.optimal_switch_time = None
         self.batch_yield = None
         self.batch_productivity = None
@@ -35,12 +38,21 @@ class TwoStageFermentation(object):
     def calculate_fermentation_data(self):
         opt_result = optimal_switch_time(self.initial_concentrations, self.time_end,
                                          [self.stage_one_fluxes, self.stage_two_fluxes], self.settings,
-                                         self.objective)
-        self.optimal_switch_time = opt_result.x[0]
-        self.data, self.time = two_stage_timecourse(self.initial_concentrations, self.time_end,
-                                                    self.optimal_switch_time,
-                                                    [self.stage_one_fluxes, self.stage_two_fluxes],
-                                                    num_of_points=self.settings.num_timepoints)
+                                         self.objective, self.productivity_constraint, self.yield_constraint,
+                                         self.titer_constraint)
+        if opt_result.success:
+            self.optimal_switch_time = opt_result.x[0]
+            self.data, self.time = two_stage_timecourse(self.initial_concentrations, self.time_end,
+                                                        self.optimal_switch_time,
+                                                        [self.stage_one_fluxes, self.stage_two_fluxes],
+                                                        num_of_points=self.settings.num_timepoints)
+        else:
+            self.optimal_switch_time = 0
+            self.data, self.time = two_stage_timecourse(self.initial_concentrations, 0,
+                                                        self.optimal_switch_time,
+                                                        [self.stage_one_fluxes, self.stage_two_fluxes],
+                                                        num_of_points=self.settings.num_timepoints)
+
         self.time_end = self.time[-1]
         self.batch_productivity = batch_productivity(self.data, self.time, self.settings)
         self.batch_productivity = self.batch_productivity*(self.batch_productivity > 0)
@@ -70,6 +82,9 @@ class OneStageFermentation(object):
         self.batch_titer = None
         self.linear_combination = None
         self.objective_value = None
+        self.productivity_constraint = settings.productivity_constraint
+        self.yield_constraint = settings.yield_constraint
+        self.titer_constraint = settings.titer_constraint
         try:
             self.objective = objective_dict[self.settings.objective]
         except KeyError:
@@ -84,8 +99,17 @@ class OneStageFermentation(object):
         self.batch_productivity = batch_productivity(self.data, self.time, self.settings)
         self.batch_yield = batch_yield(self.data, self.time, self.settings)
         self.batch_titer = batch_end_titer(self.data, self.time, self.settings)
+
+        if not((self.batch_productivity >= self.productivity_constraint) and
+               (self.batch_yield >= self.yield_constraint) and
+               (self.batch_titer >= self.titer_constraint)):
+            self.data, self.time = one_stage_timecourse(self.initial_concentrations, [0], self.fluxes)
+            self.time_end = self.time[-1]
+            self.batch_productivity = batch_productivity(self.data, self.time, self.settings)
+            self.batch_yield = batch_yield(self.data, self.time, self.settings)
+            self.batch_titer = batch_end_titer(self.data, self.time, self.settings)
+
         self.linear_combination = linear_combination(self.data, self.time, self.settings)
-        self.objective_value = getattr(self, self.settings.objective)
         try:
             self.objective_value = getattr(self, self.settings.objective)
         except AttributeError:
