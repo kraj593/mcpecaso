@@ -12,7 +12,6 @@ class Settings:
         self.productivity_coefficient = 0
         self.yield_coefficient = 0
         self.titer_coefficient = 0
-        self.dupont_metric_coefficient = 0
         self.num_timepoints = 1000
         self.substrate_uptake_start = 0.5
 
