@@ -28,6 +28,7 @@ class TwoStageFermentation(object):
         self.batch_titer = None
         self.linear_combination = None
         self.objective_value = None
+        self.constraint_flag = True
         try:
             self.objective = objective_dict[self.settings.objective]
         except KeyError:
@@ -47,6 +48,7 @@ class TwoStageFermentation(object):
                                                         [self.stage_one_fluxes, self.stage_two_fluxes],
                                                         num_of_points=self.settings.num_timepoints)
         else:
+            self.constraint_flag = False
             self.optimal_switch_time = 0
             self.data, self.time = two_stage_timecourse(self.initial_concentrations, 0,
                                                         self.optimal_switch_time,
@@ -85,6 +87,7 @@ class OneStageFermentation(object):
         self.productivity_constraint = settings.productivity_constraint
         self.yield_constraint = settings.yield_constraint
         self.titer_constraint = settings.titer_constraint
+        self.constraint_flag = True
         try:
             self.objective = objective_dict[self.settings.objective]
         except KeyError:
@@ -103,6 +106,7 @@ class OneStageFermentation(object):
         if not((self.batch_productivity >= self.productivity_constraint) and
                (self.batch_yield >= self.yield_constraint) and
                (self.batch_titer >= self.titer_constraint)):
+            self.constraint_flag = False
             self.data, self.time = one_stage_timecourse(self.initial_concentrations, [0], self.fluxes)
             self.time_end = self.time[-1]
             self.batch_productivity = batch_productivity(self.data, self.time, self.settings)
