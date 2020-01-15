@@ -62,7 +62,7 @@ def envelope_calculator(model, biomass_rxn, substrate_rxn, target_rxn, n_search_
             biomass_rxn.bounds = (growth_rate, growth_rate)
             model.objective = substrate_rxn.id
             min_feasible_uptake = model.optimize(objective_sense='minimize').objective_value
-            sub_model_prediction = -np.around(uptake_fun(growth_rate, **settings.params)+0.0000005, decimals=6)
+            sub_model_prediction = -np.around(uptake_fun(growth_rate, **settings.uptake_params)+0.0000005, decimals=6)
 
             if sub_model_prediction <= min_feasible_uptake:
                 substrate_uptake_rate = sub_model_prediction
