@@ -1,15 +1,42 @@
 import numpy as np
 from .settings import settings
+import warnings
 
 
-def growth_dependent_uptake(growth_rate, B=0):
-    A = -1
-    K = 1
-    C = 1
-    Q = 1
-    v = 1
+def logistic_uptake(growth_rate, **kwargs):
 
-    return A + (K-A)/(C + Q * np.exp(-B*growth_rate))**(1/v)
+    params = {'A': -1, 'K': 1, 'C': 1, 'Q': 1, 'v': 1, 'B': 0, 'min_sub': 0.5, 'max_sub': 10}
+
+    for arg in kwargs:
+        if arg in ['A', 'K', 'C', 'Q', 'v', 'B']:
+            params[arg] = kwargs[arg]
+        else:
+            warnings.warn("The argument \' ", arg, "\' was not recognized for the specified uptake function, and was"
+                          "ignored. Only the following arguments are accepted: ", [param for param in params])
+
+    if params['B'] == 0:
+
+        return params['max_sub']
+
+    else:
+        logistic = params['A'] + (params['K'] - params['A']) / \
+           (params['C'] + params['Q'] * np.exp(-params['B'] * growth_rate))**(1 / params['v'])
+
+        return params['min_sub'] + (params['max_sub'] - params['min_sub'])*logistic
+
+
+def linear_uptake(growth_rate, **kwargs):
+
+    params = {'m': 10, 'c': 0.5}
+
+    for arg in kwargs:
+        if arg in ['m', 'c']:
+            params[arg] = kwargs[arg]
+        else:
+            warnings.warn("The argument \' ", arg, "\' was not recognized for the specified uptake function, and was"
+                          "ignored. Only the following arguments are accepted: ", [param for param in params])
+
+    return params['m'] * growth_rate + params['c']
 
 
 def envelope_calculator(model, biomass_rxn, substrate_rxn, target_rxn, k_m=0, n_search_points=20):
@@ -22,16 +49,30 @@ def envelope_calculator(model, biomass_rxn, substrate_rxn, target_rxn, k_m=0, n_
     substrate_uptake_min = settings.substrate_uptake_start
     max_growth = model.optimize().objective_value
 
+    uptake_dict = {'linear': linear_uptake, 'logistic': logistic_uptake}
+
+    if settings.uptake_fun in uptake_dict.keys():
+        uptake_fun = uptake_dict[settings.uptake_fun]
+    else:
+        raise KeyError('Unknown substrate uptake function specified. Only ', [fun for fun in uptake_dict.keys()],
+                       'are acceptable uptake functions.')
+
     with model:
         for growth_rate in np.linspace(max_growth, 0, n_search_points):
             biomass_rxn.bounds = (growth_rate, growth_rate)
-            if k_m == 0 or growth_rate == max_growth:
-                substrate_uptake_rate = substrate_uptake_max
+            model.objective = substrate_rxn.id
+            min_feasible_uptake = model.optimize(objective_sense='minimize').objective_value
+            sub_model_prediction = -np.around(uptake_fun(growth_rate, **settings.params)+0.0000005, decimals=6)
+
+            if sub_model_prediction <= min_feasible_uptake:
+                substrate_uptake_rate = sub_model_prediction
             else:
-                substrate_uptake_rate = substrate_uptake_min +\
-                                        (substrate_uptake_max-substrate_uptake_min)*\
-                                        growth_dependent_uptake(growth_rate, k_m)
-            substrate_rxn.lower_bound = -np.around(substrate_uptake_rate+0.0000005, decimals=6)
+                warnings.warn('The parameters used with the model for substrate uptake resulted in rates that are lower'
+                              'than thee minimum feasible uptake for one or more cases. The minimum feasible uptake'
+                              ' rate was used in these cases')
+                substrate_uptake_rate = min_feasible_uptake
+
+            substrate_rxn.lower_bound = substrate_uptake_rate
             model.objective = target_rxn.id
             growth_rates.append(growth_rate)
             substrate_uptake_rates.append(substrate_uptake_rate)
