@@ -38,7 +38,6 @@ def linear_uptake(growth_rate, **kwargs):
                           ' ignored. Please check documentation for a list of acceptable parameters for the specified '
                           'uptake function.')
 
-
     return params['m'] * growth_rate + params['c']
 
 
@@ -62,14 +61,13 @@ def envelope_calculator(model, biomass_rxn, substrate_rxn, target_rxn, n_search_
         for growth_rate in np.linspace(max_growth, 0, n_search_points):
             biomass_rxn.bounds = (growth_rate, growth_rate)
             model.objective = substrate_rxn.id
-            min_feasible_uptake = model.optimize(objective_sense='minimize').objective_value
+            min_feasible_uptake = model.optimize(objective_sense='maximize').objective_value
             sub_model_prediction = -np.around(uptake_fun(growth_rate, **settings.uptake_params)+0.0000005, decimals=6)
-
             if sub_model_prediction <= min_feasible_uptake:
                 substrate_uptake_rate = sub_model_prediction
             else:
                 warnings.warn('The parameters used with the model for substrate uptake resulted in rates that are lower'
-                              'than thee minimum feasible uptake for one or more cases. The minimum feasible uptake'
+                              ' than thee minimum feasible uptake for one or more cases. The minimum feasible uptake'
                               ' rate was used in these cases')
                 substrate_uptake_rate = min_feasible_uptake
 
