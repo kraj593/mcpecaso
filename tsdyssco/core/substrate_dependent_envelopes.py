@@ -90,8 +90,8 @@ def envelope_calculator(model, biomass_rxn, substrate_rxn, target_rxn, n_search_
                 production_rates_ub.append(0)
             else:
                 production_rates_ub.append(sol_max.objective_value)
-    yield_lb = list(np.divide(production_rates_lb, substrate_uptake_rates))
-    yield_ub = list(np.divide(production_rates_ub, substrate_uptake_rates))
+    yield_lb = list(np.divide(production_rates_lb, -substrate_uptake_rates))
+    yield_ub = list(np.divide(production_rates_ub, -substrate_uptake_rates))
 
     data = dict(zip(['growth_rates', 'substrate_uptake_rates',
                      'production_rates_lb', 'production_rates_ub', 'yield_lb', 'yield_ub'],
