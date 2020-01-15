@@ -11,9 +11,9 @@ def logistic_uptake(growth_rate, **kwargs):
         if arg in ['A', 'K', 'C', 'Q', 'v', 'B']:
             params[arg] = kwargs[arg]
         else:
-            print("The argument \' ", arg, "\' was not recognized for the specified uptake function, and was"
-                  "ignored. Only the following arguments are accepted: ", [param for param in params])
-            warnings.warn('Unknown Parameters')
+            warnings.warn('One or more of the parameters specified in the settings is(are) not recognized and was(were'
+                          ' ignored. Please check documentation for a list of acceptable parameters for the specified '
+                          'uptake function.')
 
     if params['B'] == 0:
 
@@ -34,9 +34,10 @@ def linear_uptake(growth_rate, **kwargs):
         if arg in ['m', 'c']:
             params[arg] = kwargs[arg]
         else:
-            print("The argument \' ", arg, "\' was not recognized for the specified uptake function, and was"
-                  "ignored. Only the following arguments are accepted: ", [param for param in params])
-            warnings.warn('Unknown Parameters')
+            warnings.warn('One or more of the parameters specified in the settings is(are) not recognized and was(were'
+                          ' ignored. Please check documentation for a list of acceptable parameters for the specified '
+                          'uptake function.')
+
 
     return params['m'] * growth_rate + params['c']
 
