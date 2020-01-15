@@ -112,8 +112,8 @@ class TSDyssco(object):
         self.two_stage_characteristics['objective value'].append(two_stage_fermentation.objective_value)
         if not two_stage_fermentation.constraint_flag:
             self.two_stage_constraint_flag = False
-            warnings.warn("The constraints set for the fermentation metrics could not be met for one or more two stage "
-                          "fermentation batches. The fermentation metrics for these batches have been set to zero."
+            warnings.warn("The constraints set for the fermentation metrics could not be met for one or more one stage "
+                          "fermentation batches. These batches were not considered while determining the best batch. "
                           "Consider reducing or removing the constraints to resolve this issue.")
         else:
             if (two_stage_fermentation.stage_one_fluxes[0] == max(self.production_envelope['growth_rates']) and
@@ -136,7 +136,7 @@ class TSDyssco(object):
         if not one_stage_fermentation.constraint_flag:
             self.one_stage_constraint_flag = False
             warnings.warn("The constraints set for the fermentation metrics could not be met for one or more one stage "
-                          "fermentation batches. The fermentation metrics for these batches have been set to zero."
+                          "fermentation batches. These batches were not considered while determining the best batch. "
                           "Consider reducing or removing the constraints to resolve this issue.")
         else:
             if self.one_stage_best_batch is not None:
