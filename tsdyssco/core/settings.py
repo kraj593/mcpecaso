@@ -1,6 +1,5 @@
 class Settings:
     def __init__(self):
-        self.k_m = 0
         self.uptake_fun = 'generalized_logistic'
         self.params = {}
         self.parallel = False

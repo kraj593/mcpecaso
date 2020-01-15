@@ -39,7 +39,7 @@ def linear_uptake(growth_rate, **kwargs):
     return params['m'] * growth_rate + params['c']
 
 
-def envelope_calculator(model, biomass_rxn, substrate_rxn, target_rxn, k_m=0, n_search_points=20):
+def envelope_calculator(model, biomass_rxn, substrate_rxn, target_rxn, n_search_points=20):
     
     production_rates_lb = []
     production_rates_ub = []
