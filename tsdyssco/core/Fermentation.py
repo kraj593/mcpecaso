@@ -95,8 +95,11 @@ class OneStageFermentation(object):
         self.data, self.time = one_stage_timecourse(self.initial_concentrations, self.time, self.fluxes)
         self.time_end = self.time[-1]
         self.batch_productivity = batch_productivity(self.data, self.time, self.settings)
+        self.batch_productivity = self.batch_productivity*(self.batch_productivity > 0)
         self.batch_yield = batch_yield(self.data, self.time, self.settings)
+        self.batch_yield = self.batch_yield*(self.batch_yield > 0)
         self.batch_titer = batch_end_titer(self.data, self.time, self.settings)
+        self.batch_titer = self.batch_titer*(self.batch_titer > 0)
 
         if not((self.batch_productivity >= self.productivity_constraint) and
                (self.batch_yield >= self.yield_constraint) and
