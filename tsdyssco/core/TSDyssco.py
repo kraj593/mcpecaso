@@ -149,6 +149,8 @@ class TSDyssco(object):
         if self.production_envelope is None:
             self.calculate_production_envelope()
         if self.production_envelope is not None:
+            self.two_stage_fermentation_list = []
+            self.one_stage_fermentation_list = []
             envelope = self.production_envelope
             flux_list = [list(envelope[['growth_rates', 'substrate_uptake_rates', 'production_rates_ub']].iloc[i])
                          for i in range(len(envelope))]

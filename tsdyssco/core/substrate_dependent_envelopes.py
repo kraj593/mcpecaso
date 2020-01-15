@@ -11,8 +11,9 @@ def logistic_uptake(growth_rate, **kwargs):
         if arg in ['A', 'K', 'C', 'Q', 'v', 'B']:
             params[arg] = kwargs[arg]
         else:
-            warnings.warn("The argument \' ", arg, "\' was not recognized for the specified uptake function, and was"
-                          "ignored. Only the following arguments are accepted: ", [param for param in params])
+            print("The argument \' ", arg, "\' was not recognized for the specified uptake function, and was"
+                  "ignored. Only the following arguments are accepted: ", [param for param in params])
+            warnings.warn('Unknown Parameters')
 
     if params['B'] == 0:
 
@@ -33,8 +34,9 @@ def linear_uptake(growth_rate, **kwargs):
         if arg in ['m', 'c']:
             params[arg] = kwargs[arg]
         else:
-            warnings.warn("The argument \' ", arg, "\' was not recognized for the specified uptake function, and was"
-                          "ignored. Only the following arguments are accepted: ", [param for param in params])
+            print("The argument \' ", arg, "\' was not recognized for the specified uptake function, and was"
+                  "ignored. Only the following arguments are accepted: ", [param for param in params])
+            warnings.warn('Unknown Parameters')
 
     return params['m'] * growth_rate + params['c']
 
@@ -45,8 +47,6 @@ def envelope_calculator(model, biomass_rxn, substrate_rxn, target_rxn, n_search_
     production_rates_ub = []
     growth_rates = []
     substrate_uptake_rates = []
-    substrate_uptake_max = -substrate_rxn.lower_bound
-    substrate_uptake_min = settings.substrate_uptake_start
     max_growth = model.optimize().objective_value
 
     uptake_dict = {'linear': linear_uptake, 'logistic': logistic_uptake}
@@ -75,7 +75,7 @@ def envelope_calculator(model, biomass_rxn, substrate_rxn, target_rxn, n_search_
             substrate_rxn.lower_bound = substrate_uptake_rate
             model.objective = target_rxn.id
             growth_rates.append(growth_rate)
-            substrate_uptake_rates.append(substrate_uptake_rate)
+            substrate_uptake_rates.append(-substrate_uptake_rate)
             sol_min = model.optimize(objective_sense='minimize')
             if model.solver.status != 'optimal':
                 print("Min Solver wasn't feasible for Growth Rate: ", growth_rate,
@@ -90,8 +90,8 @@ def envelope_calculator(model, biomass_rxn, substrate_rxn, target_rxn, n_search_
                 production_rates_ub.append(0)
             else:
                 production_rates_ub.append(sol_max.objective_value)
-    yield_lb = list(np.divide(production_rates_lb, -substrate_uptake_rates))
-    yield_ub = list(np.divide(production_rates_ub, -substrate_uptake_rates))
+    yield_lb = list(np.divide(production_rates_lb, substrate_uptake_rates))
+    yield_ub = list(np.divide(production_rates_ub, substrate_uptake_rates))
 
     data = dict(zip(['growth_rates', 'substrate_uptake_rates',
                      'production_rates_lb', 'production_rates_ub', 'yield_lb', 'yield_ub'],

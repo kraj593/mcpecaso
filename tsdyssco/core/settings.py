@@ -13,7 +13,6 @@ class Settings:
         self.yield_coefficient = 0
         self.titer_coefficient = 0
         self.num_timepoints = 1000
-        self.substrate_uptake_start = 0.5
         self.productivity_constraint = 0
         self.yield_constraint = 0
         self.titer_constraint = 0

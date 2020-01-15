@@ -42,6 +42,7 @@ class TwoStageFermentation(object):
                                          self.objective, self.productivity_constraint, self.yield_constraint,
                                          self.titer_constraint)
         if not opt_result.success:
+            print(opt_result.message)
             self.constraint_flag = False
 
         self.optimal_switch_time = opt_result.x[0]

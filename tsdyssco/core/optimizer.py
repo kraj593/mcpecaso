@@ -51,7 +51,7 @@ def optimal_switch_time(initial_concentrations, time_end, two_stage_fluxes, sett
 
     opt_result = minimize(optimization_target, x0=np.array([4]),
                           args=(initial_concentrations, time_end, two_stage_fluxes, objective_fun, settings),
-                          options={'maxiter': 100}, method='COBYLA', tol=1e-2,
+                          options={'maxiter': 200}, method='COBYLA', tol=1e-2,
                           constraints=constraints
                           )
 

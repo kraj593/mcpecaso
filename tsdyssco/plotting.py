@@ -206,7 +206,6 @@ def plot_envelope(dyssco):
         envelope = dyssco.production_envelope
         if envelope is not None:
             target_metabolite = list(dyssco.target_rxn.metabolites.keys())[0].name
-            k_m = dyssco.k_m
             fig = tools.make_subplots(rows=1, cols=3, subplot_titles=['Substrate Uptake Rate', 'Product Flux',
                                                                       'Product Yield'],
                                       horizontal_spacing=0.1, print_grid=False)
@@ -243,8 +242,7 @@ def plot_envelope(dyssco):
             fig['layout']['yaxis2']['title'] = 'Product Flux<br>(mmol/gdw.h)'
             fig['layout']['yaxis3']['title'] = 'Product Yield<br>(mmol/mmol substrate)'
             fig['layout']['showlegend'] = False
-            fig['layout']['title'] = str(target_metabolite) + ' production characteristics in ' + str(dyssco.model.id) \
-                                     + ' with substrate uptake penalty: ' + str(k_m)
+            fig['layout']['title'] = str(target_metabolite) + ' production characteristics in ' + str(dyssco.model.id)
             fig['layout']['yaxis1']['range'] = [0,
                                                 1.2 * max(envelope['substrate_uptake_rates'])]
             fig['layout']['yaxis2']['range'] = [min(envelope['production_rates_lb']),
