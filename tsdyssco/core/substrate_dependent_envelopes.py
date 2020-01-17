@@ -28,7 +28,7 @@ def logistic_uptake(growth_rate, **kwargs):
 
 def linear_uptake(growth_rate, **kwargs):
 
-    params = {'m': 10, 'c': 0.5}
+    params = {'m': 10, 'c': 0.5, 'max_sub':10}
 
     for arg in kwargs:
         if arg in ['m', 'c']:
@@ -38,7 +38,10 @@ def linear_uptake(growth_rate, **kwargs):
                           ' ignored. Please check documentation for a list of acceptable parameters for the specified '
                           'uptake function.')
 
-    return params['m'] * growth_rate + params['c']
+    if params['m'] * growth_rate + params['c'] > 10:
+        return 10
+    else:
+        return params['m'] * growth_rate + params['c']
 
 
 def envelope_calculator(model, biomass_rxn, substrate_rxn, target_rxn, n_search_points=20):
