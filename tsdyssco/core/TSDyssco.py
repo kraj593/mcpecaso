@@ -111,6 +111,7 @@ class TSDyssco(object):
         self.two_stage_characteristics['yield'].append(two_stage_fermentation.batch_yield)
         self.two_stage_characteristics['titer'].append(two_stage_fermentation.batch_titer)
         self.two_stage_characteristics['objective value'].append(two_stage_fermentation.objective_value)
+
         if not two_stage_fermentation.constraint_flag:
             self.two_stage_constraint_flag = False
             warnings.warn("The constraints set for the fermentation metrics could not be met for one or more one stage "
@@ -154,6 +155,9 @@ class TSDyssco(object):
         if self.production_envelope is not None:
             self.two_stage_fermentation_list = []
             self.one_stage_fermentation_list = []
+            self.two_stage_suboptimal_batch = None
+            self.two_stage_best_batch = None
+            self.one_stage_best_batch = None
             envelope = self.production_envelope
             flux_list = [list(envelope[['growth_rates', 'substrate_uptake_rates', 'production_rates_ub']].iloc[i])
                          for i in range(len(envelope))]
