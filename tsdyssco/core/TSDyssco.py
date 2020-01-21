@@ -24,6 +24,7 @@ class TSDyssco(object):
         self.two_stage_suboptimal_batch = None
         self.two_stage_best_batch = None
         self.one_stage_best_batch = None
+        self.settings = settings
         self.one_stage_constraint_flag = True
         self.two_stage_constraint_flag = True
         self.two_stage_characteristics = {'stage_one_growth_rate': [],
@@ -39,12 +40,12 @@ class TSDyssco(object):
                                           'objective value': []}
 
         objective_name = ''
-        if settings.productivity_coefficient:
-            objective_name += str(settings.productivity_coefficient) + ' * productivity + '
-        if settings.yield_coefficient:
-            objective_name += str(settings.yield_coefficient) + ' * yield + '
-        if settings.titer_coefficient:
-            objective_name += str(settings.titer_coefficient) + ' * titer + '
+        if self.settings.productivity_coefficient:
+            objective_name += str(self.settings.productivity_coefficient) + ' * productivity + '
+        if self.settings.yield_coefficient:
+            objective_name += str(self.settings.yield_coefficient) + ' * yield + '
+        if self.settings.titer_coefficient:
+            objective_name += str(self.settings.titer_coefficient) + ' * titer + '
         objective_name = objective_name.rstrip(" + ")
 
         objective_dict = {'batch_productivity': 'productivity',
@@ -54,7 +55,7 @@ class TSDyssco(object):
 
 
         try:
-            self.objective_name = objective_dict[settings.objective]
+            self.objective_name = objective_dict[self.settings.objective]
         except KeyError:
             warnings.warn("Please check your objective. The objective provided in the settings class isn't valid.")
             self.objective_name = objective_dict['batch_productivity']
@@ -98,7 +99,7 @@ class TSDyssco(object):
         if self.model_complete_flag:
             self.production_envelope = pd.DataFrame(envelope_calculator(self.model, self.biomass_rxn,
                                                                         self.substrate_rxn, self.target_rxn,
-                                                                        settings.num_points))
+                                                                        self.settings.num_points))
         else:
             warnings.warn("The production envelope could not be generated.")
 
@@ -158,23 +159,23 @@ class TSDyssco(object):
                          for i in range(len(envelope))]
             for i in range(len(flux_list)):
                 flux_list[i][1] = -flux_list[i][1]
-            if settings.parallel:
+            if self.settings.parallel:
                 print('Starting parallel pool')
                 num_cores = multiprocessing.cpu_count()
                 start_time = time.time()
                 os_ferm_list = Parallel(n_jobs=num_cores, verbose=5)(
-                    delayed(OneStageFermentation)(flux_list[index], settings)
+                    delayed(OneStageFermentation)(flux_list[index], self.settings)
                     for index in range(len(flux_list)))
                 ts_ferm_list = Parallel(n_jobs=num_cores, verbose=5)(
-                    delayed(TwoStageFermentation)(flux_list[stage_one_index], flux_list[stage_two_index], settings)
+                    delayed(TwoStageFermentation)(flux_list[stage_one_index], flux_list[stage_two_index], self.settings)
                     for stage_one_index in range(len(flux_list))
                     for stage_two_index in range(len(flux_list)))
                 end_time = time.time()
             else:
                 start_time = time.time()
-                os_ferm_list = [OneStageFermentation(flux_list[index], settings)
+                os_ferm_list = [OneStageFermentation(flux_list[index], self.settings)
                                 for index in range(len(flux_list))]
-                ts_ferm_list = [TwoStageFermentation(flux_list[stage_one_index], flux_list[stage_two_index], settings)
+                ts_ferm_list = [TwoStageFermentation(flux_list[stage_one_index], flux_list[stage_two_index], self.settings)
                                 for stage_one_index in range(len(flux_list))
                                 for stage_two_index in range(len(flux_list))]
                 end_time = time.time()
