@@ -322,34 +322,37 @@ def two_stage_char_contour(dyssco):
                                                           len=1.05,
                                                           lenmode='fraction',
                                                           outlinewidth=1)))
-                tracelist.append(go.Scatter(x=[dyssco.two_stage_best_batch.stage_one_fluxes[0]],
-                                            y=[dyssco.two_stage_best_batch.stage_two_fluxes[0]],
-                                            mode='markers', hoverinfo='text', showlegend=True,
-                                            name='Best Two Stage Point',
-                                            text=['Best Two Stage Point<br>' + characteristic.title() + ': ' +
-                                                  str(round(getattr(dyssco.two_stage_best_batch,
-                                                                    attribute_names[row]), 3))],
-                                            marker=dict(color='rgb(81, 206, 59)',
-                                                        size=10)))
-                tracelist.append(go.Scatter(x=[dyssco.one_stage_best_batch.fluxes[0]],
-                                            y=[dyssco.one_stage_best_batch.fluxes[0]],
-                                            name='Best One Stage Point',
-                                            mode='markers', hoverinfo='text', showlegend=True,
-                                            text=['Best One Stage Point<br>' + characteristic.title() + ': ' +
-                                                  str(round(getattr(dyssco.one_stage_best_batch,
-                                                                    attribute_names[row]), 3))],
-                                            marker=dict(color='rgb(252, 217, 17)',
-                                                        size=10)))
-                tracelist.append(go.Scatter(x=[dyssco.two_stage_suboptimal_batch.stage_one_fluxes[0]],
-                                            y=[dyssco.two_stage_suboptimal_batch.stage_two_fluxes[0]],
-                                            name='Max Growth to Min Growth Point',
-                                            mode='markers', hoverinfo='text', showlegend=True,
-                                            text=['Max Growth to Min Growth Point<br>' +
-                                                  characteristic.title() + ': ' +
-                                                  str(round(getattr(dyssco.two_stage_suboptimal_batch,
-                                                                    attribute_names[row]), 3))],
-                                            marker=dict(color='rgb(255, 0, 0)',
-                                                        size=10)))
+                if dyssco.two_stage_best_batch:
+                    tracelist.append(go.Scatter(x=[dyssco.two_stage_best_batch.stage_one_fluxes[0]],
+                                                y=[dyssco.two_stage_best_batch.stage_two_fluxes[0]],
+                                                mode='markers', hoverinfo='text', showlegend=True,
+                                                name='Best Two Stage Point',
+                                                text=['Best Two Stage Point<br>' + characteristic.title() + ': ' +
+                                                      str(round(getattr(dyssco.two_stage_best_batch,
+                                                                        attribute_names[row]), 3))],
+                                                marker=dict(color='rgb(81, 206, 59)',
+                                                            size=10)))
+                if dyssco.one_stage_best_batch:
+                    tracelist.append(go.Scatter(x=[dyssco.one_stage_best_batch.fluxes[0]],
+                                                y=[dyssco.one_stage_best_batch.fluxes[0]],
+                                                name='Best One Stage Point',
+                                                mode='markers', hoverinfo='text', showlegend=True,
+                                                text=['Best One Stage Point<br>' + characteristic.title() + ': ' +
+                                                      str(round(getattr(dyssco.one_stage_best_batch,
+                                                                        attribute_names[row]), 3))],
+                                                marker=dict(color='rgb(252, 217, 17)',
+                                                            size=10)))
+                if dyssco.two_stage_suboptimal_batch:
+                    tracelist.append(go.Scatter(x=[dyssco.two_stage_suboptimal_batch.stage_one_fluxes[0]],
+                                                y=[dyssco.two_stage_suboptimal_batch.stage_two_fluxes[0]],
+                                                name='Max Growth to Min Growth Point',
+                                                mode='markers', hoverinfo='text', showlegend=True,
+                                                text=['Max Growth to Min Growth Point<br>' +
+                                                      characteristic.title() + ': ' +
+                                                      str(round(getattr(dyssco.two_stage_suboptimal_batch,
+                                                                        attribute_names[row]), 3))],
+                                                marker=dict(color='rgb(255, 0, 0)',
+                                                            size=10)))
 
                 fig = go.Figure(data=tracelist)
                 fig['layout']['xaxis']['range'] = [0, np.ceil(max(dyssco.two_stage_characteristics
@@ -465,40 +468,43 @@ def multi_two_stage_char_contours(dyssco_list):
                                                               outlinewidth=1),
                                                 zmin=min_characteristic, zmax=max_characteristic, ncontours=20), 1,
                                      col + 1)
-                    fig.append_trace(go.Scatter(x=[dyssco.one_stage_best_batch.fluxes[0]],
-                                                y=[dyssco.one_stage_best_batch.fluxes[0]],
-                                                name='Best One Stage Point',
-                                                mode='markers', hoverinfo='text',
-                                                showlegend=True if col == len(dyssco_list)-1 else False,
-                                                text=['Best One Stage Point<br>' + characteristic.title() + ': ' +
-                                                      str(round(getattr(dyssco.one_stage_best_batch,
-                                                                        attribute_names[row]), 3))],
-                                                marker=dict(color='rgb(252, 217, 17)',
-                                                            size=10),
-                                                legendgroup='Best One Stage Point'), 1, col+1)
-                    fig.append_trace(go.Scatter(x=[dyssco.two_stage_suboptimal_batch.stage_one_fluxes[0]],
-                                                y=[dyssco.two_stage_suboptimal_batch.stage_two_fluxes[0]],
-                                                name='Max Growth to Min Growth Point',
-                                                mode='markers', hoverinfo='text',
-                                                showlegend=True if col == len(dyssco_list) - 1 else False,
-                                                text=['Max Growth to Min Growth Point<br>' +
-                                                      characteristic.title() + ': ' +
-                                                      str(round(getattr(dyssco.two_stage_suboptimal_batch,
-                                                                        attribute_names[row]), 3))],
-                                                marker=dict(color='rgb(255, 0, 0)',
-                                                            size=10),
-                                                legendgroup='Max Growth to Min Growth Point'), 1, col + 1)
-                    fig.append_trace(go.Scatter(x=[dyssco.two_stage_best_batch.stage_one_fluxes[0]],
-                                                y=[dyssco.two_stage_best_batch.stage_two_fluxes[0]],
-                                                mode='markers', hoverinfo='text',
-                                                showlegend=True if col == len(dyssco_list) - 1 else False,
-                                                name='Best Two Stage Point',
-                                                text=['Best Two Stage Point<br>' + characteristic.title() + ': ' +
-                                                      str(round(getattr(dyssco.two_stage_best_batch,
-                                                                        attribute_names[row]), 3))],
-                                                marker=dict(color='rgb(81, 206, 59)',
-                                                            size=10),
-                                                legendgroup='Best Two Stage Point'), 1, col + 1)
+                    if dyssco.one_stage_best_batch:
+                        fig.append_trace(go.Scatter(x=[dyssco.one_stage_best_batch.fluxes[0]],
+                                                    y=[dyssco.one_stage_best_batch.fluxes[0]],
+                                                    name='Best One Stage Point',
+                                                    mode='markers', hoverinfo='text',
+                                                    showlegend=True if col == len(dyssco_list)-1 else False,
+                                                    text=['Best One Stage Point<br>' + characteristic.title() + ': ' +
+                                                          str(round(getattr(dyssco.one_stage_best_batch,
+                                                                            attribute_names[row]), 3))],
+                                                    marker=dict(color='rgb(252, 217, 17)',
+                                                                size=10),
+                                                    legendgroup='Best One Stage Point'), 1, col+1)
+                    if dyssco.two_stage_suboptimal_batch:
+                        fig.append_trace(go.Scatter(x=[dyssco.two_stage_suboptimal_batch.stage_one_fluxes[0]],
+                                                    y=[dyssco.two_stage_suboptimal_batch.stage_two_fluxes[0]],
+                                                    name='Max Growth to Min Growth Point',
+                                                    mode='markers', hoverinfo='text',
+                                                    showlegend=True if col == len(dyssco_list) - 1 else False,
+                                                    text=['Max Growth to Min Growth Point<br>' +
+                                                          characteristic.title() + ': ' +
+                                                          str(round(getattr(dyssco.two_stage_suboptimal_batch,
+                                                                            attribute_names[row]), 3))],
+                                                    marker=dict(color='rgb(255, 0, 0)',
+                                                                size=10),
+                                                    legendgroup='Max Growth to Min Growth Point'), 1, col + 1)
+                    if dyssco.two_stage_best_batch:
+                        fig.append_trace(go.Scatter(x=[dyssco.two_stage_best_batch.stage_one_fluxes[0]],
+                                                    y=[dyssco.two_stage_best_batch.stage_two_fluxes[0]],
+                                                    mode='markers', hoverinfo='text',
+                                                    showlegend=True if col == len(dyssco_list) - 1 else False,
+                                                    name='Best Two Stage Point',
+                                                    text=['Best Two Stage Point<br>' + characteristic.title() + ': ' +
+                                                          str(round(getattr(dyssco.two_stage_best_batch,
+                                                                            attribute_names[row]), 3))],
+                                                    marker=dict(color='rgb(81, 206, 59)',
+                                                                size=10),
+                                                    legendgroup='Best Two Stage Point'), 1, col + 1)
 
                     fig['layout']['xaxis'+str(col+1)]['range'] = [0, np.ceil(max_stage_one_growth/0.05)*0.05]
                     fig['layout']['xaxis'+str(col+1)]['dtick'] = np.around(max_stage_one_growth / 5, 2)
