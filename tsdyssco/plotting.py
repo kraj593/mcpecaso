@@ -550,38 +550,39 @@ def plot_dyssco_dfba(dyssco):
             max_conc = max([(max([max(data) for data in ferm.data])) for ferm in ferm_list])
             max_t = max([max(ferm.time) for ferm in ferm_list])
             for col, ferm in enumerate(ferm_list):
-                fig.append_trace(go.Scatter(x=ferm.time, y=ferm.data[0], name='Biomass Concentration',
-                                            line={'color': '#8c564b'}, legendgroup='Biomass',
-                                            showlegend=True if col == 2 else False, mode='lines'), 1, col+1)
-                fig.append_trace(go.Scatter(x=ferm.time, y=ferm.data[1], name='Substrate Concentration',
-                                            line={'color': '#1f77b4'}, legendgroup='Substrate',
-                                            showlegend=True if col == 2 else False, mode='lines'), 1, col + 1)
-                fig.append_trace(go.Scatter(x=ferm.time, y=ferm.data[2], name='Product Concentration',
-                                            line={'color': '#e377c2'}, legendgroup='Product',
-                                            showlegend=True if col == 2 else False, mode='lines'), 1, col + 1)
-                if col != 1:
-                    fig.append_trace(go.Scatter(x=[ferm.optimal_switch_time]*30,
-                                                y=np.linspace(0, 0.8*max_conc, 30),
-                                                name='Optimal Switch Time', mode='lines',
-                                                line={'color': 'black',
-                                                        'width': 3,
-                                                        'dash': 'dot'},
-                                                showlegend=True if col == 2 else False), 1, col+1)
-                fig['layout']['xaxis'+str(col+1)]['range'] = [0, max_t]
-                fig['layout']['yaxis'+str(col+1)]['range'] = [0, 1.2*max_conc]
-                fig['layout']['annotations'] = list(fig['layout']['annotations']) + \
-                                               [go.layout.Annotation
-                                                (dict(x=max_t / 3,
-                                                      y=1.05*max_conc,
-                                                      xref='x'+str(col+1), yref='y'+str(col+1),
-                                                      text='Productivity=' + str(round(ferm.batch_productivity, 3)) +
-                                                      '<br>Yield=' + str(round(ferm.batch_yield, 3)) +
-                                                      '<br>End Titer=' + str(round(ferm.batch_titer,3)),
-                                                      showarrow=False,
-                                                      ax=-0, ay=-0))]
-                fig['layout']['xaxis'+str(col+1)]['title'] = 'Time (h)'
-                fig['layout']['xaxis'+str(col+1)]['ticks'] = 'outside'
-                fig['layout']['yaxis'+str(col+1)]['ticks'] = 'outside'
+                if ferm:
+                    fig.append_trace(go.Scatter(x=ferm.time, y=ferm.data[0], name='Biomass Concentration',
+                                                line={'color': '#8c564b'}, legendgroup='Biomass',
+                                                showlegend=True if col == 2 else False, mode='lines'), 1, col+1)
+                    fig.append_trace(go.Scatter(x=ferm.time, y=ferm.data[1], name='Substrate Concentration',
+                                                line={'color': '#1f77b4'}, legendgroup='Substrate',
+                                                showlegend=True if col == 2 else False, mode='lines'), 1, col + 1)
+                    fig.append_trace(go.Scatter(x=ferm.time, y=ferm.data[2], name='Product Concentration',
+                                                line={'color': '#e377c2'}, legendgroup='Product',
+                                                showlegend=True if col == 2 else False, mode='lines'), 1, col + 1)
+                    if col != 1:
+                        fig.append_trace(go.Scatter(x=[ferm.optimal_switch_time]*30,
+                                                    y=np.linspace(0, 0.8*max_conc, 30),
+                                                    name='Optimal Switch Time', mode='lines',
+                                                    line={'color': 'black',
+                                                            'width': 3,
+                                                            'dash': 'dot'},
+                                                    showlegend=True if col == 2 else False), 1, col+1)
+                    fig['layout']['xaxis'+str(col+1)]['range'] = [0, max_t]
+                    fig['layout']['yaxis'+str(col+1)]['range'] = [0, 1.2*max_conc]
+                    fig['layout']['annotations'] = list(fig['layout']['annotations']) + \
+                                                   [go.layout.Annotation
+                                                    (dict(x=max_t / 3,
+                                                          y=1.05*max_conc,
+                                                          xref='x'+str(col+1), yref='y'+str(col+1),
+                                                          text='Productivity=' + str(round(ferm.batch_productivity, 3)) +
+                                                          '<br>Yield=' + str(round(ferm.batch_yield, 3)) +
+                                                          '<br>End Titer=' + str(round(ferm.batch_titer,3)),
+                                                          showarrow=False,
+                                                          ax=-0, ay=-0))]
+                    fig['layout']['xaxis'+str(col+1)]['title'] = 'Time (h)'
+                    fig['layout']['xaxis'+str(col+1)]['ticks'] = 'outside'
+                    fig['layout']['yaxis'+str(col+1)]['ticks'] = 'outside'
 
             target_metabolite = list(dyssco.target_rxn.metabolites.keys())[0].name
             fig['layout']['yaxis']['title'] = 'Concentration (mmol/L or g/L)'
