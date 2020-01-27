@@ -123,9 +123,11 @@ class TSDyssco(object):
                 self.two_stage_suboptimal_batch = two_stage_fermentation
             if self.two_stage_best_batch is not None:
                 if two_stage_fermentation.objective_value > self.two_stage_best_batch.objective_value:
-                    self.two_stage_best_batch = two_stage_fermentation
+                    if two_stage_fermentation.stage_one_fluxes != two_stage_fermentation.stage_two_fluxes:
+                        self.two_stage_best_batch = two_stage_fermentation
             else:
-                self.two_stage_best_batch = two_stage_fermentation
+                if two_stage_fermentation.stage_one_fluxes != two_stage_fermentation.stage_two_fluxes:
+                    self.two_stage_best_batch = two_stage_fermentation
 
     def add_one_stage_fermentation(self, one_stage_fermentation):
         self.one_stage_fermentation_list.append(one_stage_fermentation)
