@@ -8,21 +8,21 @@ def productivity_constraint(time_switch, min_productivity, initial_concentration
     data, time = two_stage_timecourse(initial_concentrations, time_end, *list(time_switch), two_stage_fluxes,
                                       settings.num_timepoints)
 
-    return batch_productivity(data, time, settings) - min_productivity
+    return (batch_productivity(data, time, settings) - min_productivity)/batch_productivity(data, time, settings)
 
 
 def yield_constraint(time_switch, min_yield, initial_concentrations, time_end, two_stage_fluxes, settings):
     data, time = two_stage_timecourse(initial_concentrations, time_end, *list(time_switch), two_stage_fluxes,
                                       settings.num_timepoints)
 
-    return batch_yield(data, time, settings) - min_yield
+    return (batch_yield(data, time, settings) - min_yield)/batch_yield(data, time, settings)
 
 
 def titer_constraint(time_switch, min_titer, initial_concentrations, time_end, two_stage_fluxes, settings):
     data, time = two_stage_timecourse(initial_concentrations, time_end, *list(time_switch), two_stage_fluxes,
                                       settings.num_timepoints)
 
-    return batch_end_titer(data, time, settings) - min_titer
+    return (batch_end_titer(data, time, settings) - min_titer)/batch_end_titer(data, time, settings)
 
 
 def optimization_target(time_switch, initial_concentrations, time_end, two_stage_fluxes, objective_fun, settings):
@@ -51,7 +51,7 @@ def optimal_switch_time(initial_concentrations, time_end, two_stage_fluxes, sett
 
     opt_result = minimize(optimization_target, x0=np.array([4]),
                           args=(initial_concentrations, time_end, two_stage_fluxes, objective_fun, settings),
-                          options={'maxiter': 200}, method='COBYLA', tol=1e-2,
+                          options={'maxiter': 200, 'catol': 1e-2}, method='COBYLA', tol=1e-2,
                           constraints=constraints
                           )
 
