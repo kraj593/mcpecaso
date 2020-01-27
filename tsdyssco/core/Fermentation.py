@@ -41,7 +41,7 @@ class TwoStageFermentation(object):
                                          [self.stage_one_fluxes, self.stage_two_fluxes], self.settings,
                                          self.objective, self.productivity_constraint, self.yield_constraint,
                                          self.titer_constraint)
-        if (not opt_result.success) and (opt_result.maxcv >= 0.5):
+        if not opt_result.success:
             print(opt_result.message)
             self.constraint_flag = False
 
