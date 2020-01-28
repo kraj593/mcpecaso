@@ -1,7 +1,7 @@
 class Settings:
     def __init__(self):
-        self.uptake_fun = 'generalized_logistic'
-        self.uptake_params = {}
+        self.uptake_fun = 'logistic'
+        self.uptake_params = {'B':5}
         self.parallel = False
         self.num_points = 25
         self.objective = 'batch_productivity'

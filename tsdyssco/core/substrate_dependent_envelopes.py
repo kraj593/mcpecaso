@@ -1,5 +1,4 @@
 import numpy as np
-from .settings import settings
 import warnings
 
 
@@ -44,8 +43,9 @@ def linear_uptake(growth_rate, **kwargs):
         return params['m'] * growth_rate + params['c']
 
 
-def envelope_calculator(model, biomass_rxn, substrate_rxn, target_rxn, n_search_points=20):
-    
+def envelope_calculator(model, biomass_rxn, substrate_rxn, target_rxn, settings):
+
+    n_search_points = settings.num_points
     production_rates_lb = []
     production_rates_ub = []
     growth_rates = []

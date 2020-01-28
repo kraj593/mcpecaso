@@ -4,4 +4,3 @@ from .TSDyssco import *
 from .Fermentation import *
 from .optimizer import *
 from .fermentation_metrics import *
-from .settings import settings

@@ -7,6 +7,7 @@ import multiprocessing
 import time
 import warnings
 from .settings import settings
+from copy import deepcopy
 
 
 class TSDyssco(object):
@@ -24,9 +25,10 @@ class TSDyssco(object):
         self.two_stage_suboptimal_batch = None
         self.two_stage_best_batch = None
         self.one_stage_best_batch = None
-        self.settings = settings
+        self.settings = deepcopy(settings)
         self.one_stage_constraint_flag = True
         self.two_stage_constraint_flag = True
+        self.objective_name = ''
         self.two_stage_characteristics = {'stage_one_growth_rate': [],
                                           'stage_two_growth_rate': [],
                                           'productivity': [],
@@ -39,26 +41,6 @@ class TSDyssco(object):
                                           'titer': [],
                                           'objective value': []}
 
-        objective_name = ''
-        if self.settings.productivity_coefficient:
-            objective_name += str(self.settings.productivity_coefficient) + ' * productivity + '
-        if self.settings.yield_coefficient:
-            objective_name += str(self.settings.yield_coefficient) + ' * yield + '
-        if self.settings.titer_coefficient:
-            objective_name += str(self.settings.titer_coefficient) + ' * titer + '
-        objective_name = objective_name.rstrip(" + ")
-
-        objective_dict = {'batch_productivity': 'productivity',
-                          'batch_yield': 'yield',
-                          'batch_titer': 'titer',
-                          'linear_combination': objective_name}
-
-
-        try:
-            self.objective_name = objective_dict[self.settings.objective]
-        except KeyError:
-            warnings.warn("Please check your objective. The objective provided in the settings class isn't valid.")
-            self.objective_name = objective_dict['batch_productivity']
         for key in kwargs:
 
             if key in ['model', 'biomass_rxn', 'substrate_rxn', 'target_rxn', 'condition']:
@@ -99,7 +81,7 @@ class TSDyssco(object):
         if self.model_complete_flag:
             self.production_envelope = pd.DataFrame(envelope_calculator(self.model, self.biomass_rxn,
                                                                         self.substrate_rxn, self.target_rxn,
-                                                                        self.settings.num_points))
+                                                                        self.settings))
         else:
             warnings.warn("The production envelope could not be generated.")
 
@@ -151,6 +133,25 @@ class TSDyssco(object):
     def calculate_fermentation_characteristics(self):
         if self.production_envelope is None:
             self.calculate_production_envelope()
+
+        objective_name = ''
+        if self.settings.productivity_coefficient:
+            objective_name += str(self.settings.productivity_coefficient) + ' * productivity + '
+        if self.settings.yield_coefficient:
+            objective_name += str(self.settings.yield_coefficient) + ' * yield + '
+        if self.settings.titer_coefficient:
+            objective_name += str(self.settings.titer_coefficient) + ' * titer + '
+        objective_name = objective_name.rstrip(" + ")
+        objective_dict = {'batch_productivity': 'productivity',
+                          'batch_yield': 'yield',
+                          'batch_titer': 'titer',
+                          'linear_combination': objective_name}
+        try:
+            self.objective_name = objective_dict[self.settings.objective]
+        except KeyError:
+            warnings.warn("Please check your objective. The objective provided in the settings class isn't valid.")
+            self.objective_name = objective_dict['batch_productivity']
+
         if self.production_envelope is not None:
             self.two_stage_fermentation_list = []
             self.one_stage_fermentation_list = []
