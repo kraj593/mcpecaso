@@ -66,10 +66,10 @@ def two_stage_timecourse(initial_concentrations, time_end, time_switch, two_stag
     # These two conditions are to ensure that the optimizer functions properly
     if time_switch > time_end:
         time_switch = time_end
-    if time_switch < 0:
+    if (time_switch < 0) or np.isnan(time_switch):
         time_switch = 0
 
-    if int(num_of_points*(time_switch/time_end)) != 0:
+    if np.floor(num_of_points*(time_switch/time_end)) != 0:
         time_stage_one = np.linspace(0, time_switch, int(num_of_points*(time_switch/time_end)))
         data_stage_one, time_stage_one = one_stage_timecourse(stage_one_start_data, time_stage_one, stage_one_fluxes)
     else:
