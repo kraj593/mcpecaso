@@ -65,3 +65,95 @@ def optimal_switch_time(initial_concentrations, time_end, two_stage_fluxes, sett
     return opt_result
 
 
+def productivity_constraint_continuous(independent_variables, min_productivity, initial_concentrations, time_end, model,
+                                       max_growth, biomass_rxn, substrate_rxn, target_rxn, settings):
+
+    time_switch, stage_one_factor, stage_two_factor = independent_variables
+    data, time = two_stage_timecourse_continuous(initial_concentrations, time_end, time_switch, stage_one_factor,
+                                                 stage_two_factor, model, max_growth, biomass_rxn, substrate_rxn,
+                                                 target_rxn, settings)
+
+    return (batch_productivity(data, time, settings) - min_productivity)/min_productivity
+
+
+def yield_constraint_continuous(independent_variables, min_yield, initial_concentrations, time_end, model,
+                                max_growth, biomass_rxn, substrate_rxn, target_rxn, settings):
+
+    time_switch, stage_one_factor, stage_two_factor = independent_variables
+    data, time = two_stage_timecourse_continuous(initial_concentrations, time_end, time_switch, stage_one_factor,
+                                                 stage_two_factor, model, max_growth, biomass_rxn, substrate_rxn,
+                                                 target_rxn, settings)
+
+    return (batch_yield(data, time, settings) - min_yield)/min_yield
+
+
+def titer_constraint_continuous(independent_variables, min_titer, initial_concentrations, time_end, model,
+                                max_growth, biomass_rxn, substrate_rxn, target_rxn, settings):
+
+    time_switch, stage_one_factor, stage_two_factor = independent_variables
+    data, time = two_stage_timecourse_continuous(initial_concentrations, time_end, time_switch, stage_one_factor,
+                                                 stage_two_factor, model, max_growth, biomass_rxn, substrate_rxn,
+                                                 target_rxn, settings)
+
+    return (batch_end_titer(data, time, settings) - min_titer)/min_titer
+
+
+def optimization_target_continuous(independent_variables, initial_concentrations, time_end, model, max_growth,
+                                   biomass_rxn, substrate_rxn, target_rxn, objective_fun, settings):
+
+    time_switch, stage_one_factor, stage_two_factor = independent_variables
+    data, time = two_stage_timecourse_continuous(initial_concentrations, time_end, time_switch, stage_one_factor,
+                                                 stage_two_factor, model, max_growth, biomass_rxn, substrate_rxn,
+                                                 target_rxn, settings)
+
+    return -objective_fun(data, time, settings)
+
+
+def optimal_switch_time_continuous(initial_concentrations, time_end, model, max_growth, biomass_rxn, substrate_rxn,
+                                   target_rxn, settings, objective_fun=batch_productivity, min_productivity=0,
+                                   min_yield=0, min_titer=0, extrema_type='ts_best'):
+
+    constraints = [{'type': 'ineq', 'fun': lambda x: x[1]},
+                   {'type': 'ineq', 'fun': lambda x: x[2]},
+                   {'type': 'ineq', 'fun': lambda x: 1 - x[1]},
+                   {'type': 'ineq', 'fun': lambda x: 1 - x[2]}]
+
+    if extrema_type == 'os_best':
+        constraints.append({'type': 'ineq', 'fun': lambda x: x[1] - x[2]})
+        constraints.append({'type': 'ineq', 'fun': lambda x: x[2] - x[1]})
+
+    if extrema_type == 'ts_sub':
+        constraints.append({'type': 'ineq', 'fun': lambda x: x[1] - 1})
+        constraints.append({'type': 'ineq', 'fun': lambda x: 0 - x[2]})
+
+    if min_productivity:
+        constraints.append({'type': 'ineq', 'fun': productivity_constraint_continuous,
+                            'args': ([min_productivity, initial_concentrations, time_end, model, max_growth,
+                                      biomass_rxn, substrate_rxn, target_rxn, settings])})
+
+    if min_yield:
+        constraints.append({'type': 'ineq', 'fun': yield_constraint_continuous,
+                            'args': ([min_yield, initial_concentrations, time_end, model, max_growth,
+                                      biomass_rxn, substrate_rxn, target_rxn, settings])})
+
+    if min_titer:
+        constraints.append({'type': 'ineq', 'fun': titer_constraint_continuous,
+                            'args': ([min_titer, initial_concentrations, time_end, model, max_growth,
+                                      biomass_rxn, substrate_rxn, target_rxn, settings])})
+
+    opt_result = minimize(optimization_target_continuous, x0=np.array([6, 1, 0]),
+                          args=(initial_concentrations, time_end, model, max_growth, biomass_rxn, substrate_rxn,
+                                target_rxn, objective_fun, settings),
+                          options={'maxiter': 10000, 'catol': 4e-2}, method='COBYLA', tol=1e-2,
+                          constraints=constraints
+                          )
+
+    temp_data, temp_time = two_stage_timecourse_continuous(initial_concentrations, time_end, opt_result.x[0],
+                                                           opt_result.x[1], opt_result.x[2], model, max_growth,
+                                                           biomass_rxn, substrate_rxn, target_rxn, settings)
+
+    if opt_result.x[0] <= 0:
+        opt_result.x[0] = 0
+    elif opt_result.x[0] > temp_time[-1]:
+        opt_result.x[0] = temp_time[-1]
+    return opt_result
