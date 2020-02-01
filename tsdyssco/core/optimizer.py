@@ -115,16 +115,16 @@ def optimal_switch_time_continuous(initial_concentrations, time_end, model, max_
 
     constraints = [{'type': 'ineq', 'fun': lambda x: x[1]},
                    {'type': 'ineq', 'fun': lambda x: x[2]},
-                   {'type': 'ineq', 'fun': lambda x: 1 - x[1]},
-                   {'type': 'ineq', 'fun': lambda x: 1 - x[2]}]
+                   {'type': 'ineq', 'fun': lambda x: (1 - x[1])*1000},
+                   {'type': 'ineq', 'fun': lambda x: (1 - x[2])*1000}]
 
     if extrema_type == 'os_best':
-        constraints.append({'type': 'ineq', 'fun': lambda x: x[1] - x[2]})
-        constraints.append({'type': 'ineq', 'fun': lambda x: x[2] - x[1]})
+        constraints.append({'type': 'ineq', 'fun': lambda x: (x[1] - x[2])*1000})
+        constraints.append({'type': 'ineq', 'fun': lambda x: (x[2] - x[1])*1000})
 
     if extrema_type == 'ts_sub':
-        constraints.append({'type': 'ineq', 'fun': lambda x: x[1] - 1})
-        constraints.append({'type': 'ineq', 'fun': lambda x: 0 - x[2]})
+        constraints.append({'type': 'ineq', 'fun': lambda x: (x[1] - 1)*1000})
+        constraints.append({'type': 'ineq', 'fun': lambda x: (0 - x[2])*1000})
 
     if min_productivity:
         constraints.append({'type': 'ineq', 'fun': productivity_constraint_continuous,
@@ -144,7 +144,7 @@ def optimal_switch_time_continuous(initial_concentrations, time_end, model, max_
     opt_result = minimize(optimization_target_continuous, x0=np.array([6, 1, 0]),
                           args=(initial_concentrations, time_end, model, max_growth, biomass_rxn, substrate_rxn,
                                 target_rxn, objective_fun, settings),
-                          options={'maxiter': 10000, 'catol': 4e-2}, method='COBYLA', tol=1e-2,
+                          options={'maxiter': 10000, 'catol': 5e-2}, method='COBYLA', tol=1e-2,
                           constraints=constraints
                           )
 
