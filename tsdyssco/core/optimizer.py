@@ -160,6 +160,8 @@ def optimal_switch_time_continuous(initial_concentrations, time_end, model, max_
     successful_opt_values = [opt.fun for opt in opt_results if opt.success]
     if successful_opt_values:
         opt_result = [opt for opt in opt_results if opt.fun == min(successful_opt_values)][0]
+    else:
+        opt_result = opt_results[0]
 
     temp_data, temp_time = two_stage_timecourse_continuous(initial_concentrations, time_end, opt_result.x[0],
                                                            opt_result.x[1], opt_result.x[2], model, max_growth,
