@@ -118,21 +118,22 @@ def optimal_switch_time_continuous(initial_concentrations, time_end, model, max_
                    {'type': 'ineq', 'fun': lambda x: (1 - x[1])*100000},
                    {'type': 'ineq', 'fun': lambda x: (1 - x[2])*100000}]
 
-    initial_guess = [0, 0, 0]
+    initial_guesses = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
     if extrema_type == 'os_best':
-        initial_guess = [0, 0.01, 0.01]
+        initial_guesses = [[0, 0.01, 0.01], [0, 0.3, 0.3], [0, 0.5, 0.5]]
         constraints.append({'type': 'ineq', 'fun': lambda x: (x[1] - x[2])*1000})
         constraints.append({'type': 'ineq', 'fun': lambda x: (x[2] - x[1])*1000})
 
-
     if extrema_type == 'ts_sub':
-        initial_guess = [1, 1, 0]
-        constraints.append({'type': 'ineq', 'fun': lambda x: (x[0] - 0.1)})
+        initial_guesses = [[1, 1, 0], [3, 1, 0], [6, 1, 0]]
+        constraints.append({'type': 'ineq', 'fun': lambda x: (x[0] - 0.01)})
         constraints.append({'type': 'ineq', 'fun': lambda x: (x[1] - 1)*1000})
         constraints.append({'type': 'ineq', 'fun': lambda x: (0 - x[2])*1000})
 
     if extrema_type == 'ts_best':
-        initial_guess = [1, 0.95, 0.05]
+        initial_guesses = [[5, 1, 0], [3, 0.2, 0], [5, 0.4, 0.2]]
+        constraints.append({'type': 'ineq', 'fun': lambda x: (x[0] - 1)})
+
 
     if min_productivity:
         constraints.append({'type': 'ineq', 'fun': productivity_constraint_continuous,
@@ -148,13 +149,17 @@ def optimal_switch_time_continuous(initial_concentrations, time_end, model, max_
         constraints.append({'type': 'ineq', 'fun': titer_constraint_continuous,
                             'args': ([min_titer, initial_concentrations, time_end, model, max_growth,
                                       biomass_rxn, substrate_rxn, target_rxn, settings])})
+    opt_results = []
+    for i in range(3):
+        opt_results.append(minimize(optimization_target_continuous, x0=np.array(initial_guesses[i]),
+                                    args=(initial_concentrations, time_end, model, max_growth, biomass_rxn,
+                                          substrate_rxn, target_rxn, objective_fun, settings),
+                                    options={'maxiter': 1000, 'catol': 4e-2}, method='COBYLA', tol=5e-3,
+                                    constraints=constraints))
 
-    opt_result = minimize(optimization_target_continuous, x0=np.array(initial_guess),
-                          args=(initial_concentrations, time_end, model, max_growth, biomass_rxn, substrate_rxn,
-                                target_rxn, objective_fun, settings),
-                          options={'maxiter': 1000, 'catol': 4e-2}, method='COBYLA', tol=5e-3,
-                          constraints=constraints
-                          )
+    successful_opt_values = [opt.fun for opt in opt_results if opt.success]
+    if successful_opt_values:
+        opt_result = [opt for opt in opt_results if opt.fun == min(successful_opt_values)][0]
 
     temp_data, temp_time = two_stage_timecourse_continuous(initial_concentrations, time_end, opt_result.x[0],
                                                            opt_result.x[1], opt_result.x[2], model, max_growth,
@@ -165,6 +170,5 @@ def optimal_switch_time_continuous(initial_concentrations, time_end, model, max_
     elif opt_result.x[0] > temp_time[-1]:
         opt_result.x[0] = temp_time[-1]
 
-    print(opt_result)
 
     return opt_result
