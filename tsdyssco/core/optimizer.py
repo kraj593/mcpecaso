@@ -121,14 +121,14 @@ def optimal_switch_time_continuous(initial_concentrations, time_end, model, max_
     initial_guesses = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
     if extrema_type == 'os_best':
         initial_guesses = [[0, 0.01, 0.01], [0, 0.3, 0.3], [0, 0.5, 0.5]]
-        constraints.append({'type': 'ineq', 'fun': lambda x: (x[1] - x[2])*1000})
-        constraints.append({'type': 'ineq', 'fun': lambda x: (x[2] - x[1])*1000})
+        constraints.append({'type': 'ineq', 'fun': lambda x: (x[1] - x[2])*100000})
+        constraints.append({'type': 'ineq', 'fun': lambda x: (x[2] - x[1])*100000})
 
     if extrema_type == 'ts_sub':
         initial_guesses = [[1, 1, 0], [3, 1, 0], [6, 1, 0]]
         constraints.append({'type': 'ineq', 'fun': lambda x: (x[0] - 0.01)})
-        constraints.append({'type': 'ineq', 'fun': lambda x: (x[1] - 1)*1000})
-        constraints.append({'type': 'ineq', 'fun': lambda x: (0 - x[2])*1000})
+        constraints.append({'type': 'ineq', 'fun': lambda x: (x[1] - 1)*100000})
+        constraints.append({'type': 'ineq', 'fun': lambda x: (0 - x[2])*100000})
 
     if extrema_type == 'ts_best':
         initial_guesses = [[1, 1, 0], [1, 0.2, 0], [1, 0.4, 0.2]]
@@ -153,8 +153,8 @@ def optimal_switch_time_continuous(initial_concentrations, time_end, model, max_
         opt_results.append(minimize(optimization_target_continuous, x0=np.array(initial_guesses[i]),
                                     args=(initial_concentrations, time_end, model, max_growth, biomass_rxn,
                                           substrate_rxn, target_rxn, objective_fun, settings),
-                                    options={'maxiter': 1000, 'catol': 4e-2}, method='COBYLA', tol=5e-3,
-                                    constraints=constraints+[{'type': 'ineq', 'fun': lambda x: (x[1] - 1) * 1000}]
+                                    options={'maxiter': 1000, 'catol': 4e-2}, method='COBYLA', tol=1e-4,
+                                    constraints=constraints+[{'type': 'ineq', 'fun': lambda x: (x[1] - 1) * 100000}]
                                                 if (i == 0 and extrema_type == 'ts_best') else constraints))
 
     successful_opt_values = [opt.fun for opt in opt_results if opt.success]
