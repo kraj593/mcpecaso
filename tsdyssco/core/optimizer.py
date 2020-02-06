@@ -113,22 +113,22 @@ def optimal_switch_time_continuous(initial_concentrations, time_end, model, max_
                                    target_rxn, settings, objective_fun=batch_productivity, min_productivity=0,
                                    min_yield=0, min_titer=0, extrema_type='ts_best'):
 
-    constraints = [{'type': 'ineq', 'fun': lambda x: x[1] * 100000},
-                   {'type': 'ineq', 'fun': lambda x: x[2] * 100000},
-                   {'type': 'ineq', 'fun': lambda x: (100 - x[1])*100000},
-                   {'type': 'ineq', 'fun': lambda x: (100 - x[2])*100000}]
+    constraints = [{'type': 'ineq', 'fun': lambda x: x[1] * 100},
+                   {'type': 'ineq', 'fun': lambda x: x[2] * 100},
+                   {'type': 'ineq', 'fun': lambda x: (100 - x[1])*100},
+                   {'type': 'ineq', 'fun': lambda x: (100 - x[2])*100}]
 
     initial_guesses = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
     if extrema_type == 'os_best':
         initial_guesses = [[0, 1, 1], [0, 3, 3], [0, 50, 50]]
-        constraints.append({'type': 'ineq', 'fun': lambda x: (x[1] - x[2])*100000})
-        constraints.append({'type': 'ineq', 'fun': lambda x: (x[2] - x[1])*100000})
+        constraints.append({'type': 'ineq', 'fun': lambda x: (x[1] - x[2])*100})
+        constraints.append({'type': 'ineq', 'fun': lambda x: (x[2] - x[1])*100})
 
     if extrema_type == 'ts_sub':
         initial_guesses = [[1, 100, 0], [3, 100, 0], [6, 100, 0]]
         constraints.append({'type': 'ineq', 'fun': lambda x: (x[0] - 0.01)})
-        constraints.append({'type': 'ineq', 'fun': lambda x: (x[1] - 100)*100000})
-        constraints.append({'type': 'ineq', 'fun': lambda x: (0 - x[2])*100000})
+        constraints.append({'type': 'ineq', 'fun': lambda x: (x[1] - 100)*100})
+        constraints.append({'type': 'ineq', 'fun': lambda x: (0 - x[2])*100})
 
     if extrema_type == 'ts_best':
         initial_guesses = [[1, 1, 0], [10, 77, 0], [10, 40, 20]]
@@ -154,7 +154,7 @@ def optimal_switch_time_continuous(initial_concentrations, time_end, model, max_
                                     args=(initial_concentrations, time_end, model, max_growth, biomass_rxn,
                                           substrate_rxn, target_rxn, objective_fun, settings),
                                     options={'maxiter': 1000, 'catol': 4e-2}, method='COBYLA', tol=1e-1,
-                                    constraints=constraints + [{'type': 'ineq', 'fun': lambda x: (x[1] - 100)*100000}]
+                                    constraints=constraints + [{'type': 'ineq', 'fun': lambda x: (x[1] - 100)*100}]
                                     if (extrema_type == 'ts_best' and i == 0)
                                     else constraints))
 
