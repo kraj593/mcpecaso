@@ -109,7 +109,7 @@ def two_stage_timecourse_continuous(initial_concentrations, time_end, time_switc
                        'are acceptable uptake functions.')
 
     with model:
-        stage_one_biomass_flux = stage_one_factor*max_growth
+        stage_one_biomass_flux = stage_one_factor/100*max_growth
         stage_one_substrate_flux = -np.around(uptake_fun(stage_one_biomass_flux, **settings.uptake_params)+0.0000005,
                                               decimals=6)
         biomass_rxn.bounds = (stage_one_biomass_flux, stage_one_biomass_flux)
@@ -118,7 +118,7 @@ def two_stage_timecourse_continuous(initial_concentrations, time_end, time_switc
         stage_one_product_flux = model.optimize().objective_value
         stage_one_fluxes = [stage_one_biomass_flux, stage_one_substrate_flux, stage_one_product_flux]
 
-        stage_two_biomass_flux = stage_two_factor*max_growth
+        stage_two_biomass_flux = stage_two_factor/100*max_growth
         stage_two_substrate_flux = -np.around(uptake_fun(stage_two_biomass_flux, **settings.uptake_params)+0.0000005,
                                               decimals=6)
         biomass_rxn.bounds = (stage_two_biomass_flux, stage_two_biomass_flux)
