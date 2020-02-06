@@ -131,8 +131,8 @@ def optimal_switch_time_continuous(initial_concentrations, time_end, model, max_
         constraints.append({'type': 'ineq', 'fun': lambda x: (0 - x[2])*100000})
 
     if extrema_type == 'ts_best':
-        initial_guesses = [[1, 1, 0], [1, 0.2, 0], [1, 0.4, 0.2]]
-        #constraints.append({'type': 'ineq', 'fun': lambda x: (x[0] - 1)})
+        initial_guesses = [[1, 1, 0], [10, 0.77, 0], [10, 0.40, 0.20]]
+        #constraints.append({'type': 'ineq', 'fun': lambda x: (x[0] - 0.01)})
 
     if min_productivity:
         constraints.append({'type': 'ineq', 'fun': productivity_constraint_continuous,
@@ -153,9 +153,10 @@ def optimal_switch_time_continuous(initial_concentrations, time_end, model, max_
         opt_results.append(minimize(optimization_target_continuous, x0=np.array(initial_guesses[i]),
                                     args=(initial_concentrations, time_end, model, max_growth, biomass_rxn,
                                           substrate_rxn, target_rxn, objective_fun, settings),
-                                    options={'maxiter': 1000, 'catol': 4e-2}, method='COBYLA', tol=1e-4,
-                                    constraints=constraints+[{'type': 'ineq', 'fun': lambda x: (x[1] - 1) * 100000}]
-                                                if (i == 0 and extrema_type == 'ts_best') else constraints))
+                                    options={'maxiter': 1000, 'catol': 4e-2}, method='COBYLA', tol=1e-2,
+                                    constraints=constraints + [{'type': 'ineq', 'fun': lambda x: (x[1] - 1)*100000}]
+                                    if (extrema_type == 'ts_best' and i == 0)
+                                    else constraints))
 
     successful_opt_values = [opt.fun for opt in opt_results if opt.success]
     if successful_opt_values:
@@ -171,6 +172,5 @@ def optimal_switch_time_continuous(initial_concentrations, time_end, model, max_
         opt_result.x[0] = 0
     elif opt_result.x[0] > temp_time[-1]:
         opt_result.x[0] = temp_time[-1]
-
 
     return opt_result
