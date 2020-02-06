@@ -115,23 +115,23 @@ def optimal_switch_time_continuous(initial_concentrations, time_end, model, max_
 
     constraints = [{'type': 'ineq', 'fun': lambda x: x[1] * 100000},
                    {'type': 'ineq', 'fun': lambda x: x[2] * 100000},
-                   {'type': 'ineq', 'fun': lambda x: (1 - x[1])*100000},
-                   {'type': 'ineq', 'fun': lambda x: (1 - x[2])*100000}]
+                   {'type': 'ineq', 'fun': lambda x: (100 - x[1])*100000},
+                   {'type': 'ineq', 'fun': lambda x: (100 - x[2])*100000}]
 
     initial_guesses = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
     if extrema_type == 'os_best':
-        initial_guesses = [[0, 0.01, 0.01], [0, 0.3, 0.3], [0, 0.5, 0.5]]
+        initial_guesses = [[0, 1, 1], [0, 3, 3], [0, 50, 50]]
         constraints.append({'type': 'ineq', 'fun': lambda x: (x[1] - x[2])*100000})
         constraints.append({'type': 'ineq', 'fun': lambda x: (x[2] - x[1])*100000})
 
     if extrema_type == 'ts_sub':
-        initial_guesses = [[1, 1, 0], [3, 1, 0], [6, 1, 0]]
+        initial_guesses = [[1, 100, 0], [3, 100, 0], [6, 100, 0]]
         constraints.append({'type': 'ineq', 'fun': lambda x: (x[0] - 0.01)})
-        constraints.append({'type': 'ineq', 'fun': lambda x: (x[1] - 1)*100000})
+        constraints.append({'type': 'ineq', 'fun': lambda x: (x[1] - 100)*100000})
         constraints.append({'type': 'ineq', 'fun': lambda x: (0 - x[2])*100000})
 
     if extrema_type == 'ts_best':
-        initial_guesses = [[1, 1, 0], [10, 0.77, 0], [10, 0.40, 0.20]]
+        initial_guesses = [[1, 1, 0], [10, 77, 0], [10, 40, 20]]
         #constraints.append({'type': 'ineq', 'fun': lambda x: (x[0] - 0.01)})
 
     if min_productivity:
@@ -153,8 +153,8 @@ def optimal_switch_time_continuous(initial_concentrations, time_end, model, max_
         opt_results.append(minimize(optimization_target_continuous, x0=np.array(initial_guesses[i]),
                                     args=(initial_concentrations, time_end, model, max_growth, biomass_rxn,
                                           substrate_rxn, target_rxn, objective_fun, settings),
-                                    options={'maxiter': 1000, 'catol': 4e-2}, method='COBYLA', tol=1e-2,
-                                    constraints=constraints + [{'type': 'ineq', 'fun': lambda x: (x[1] - 1)*100000}]
+                                    options={'maxiter': 1000, 'catol': 4e-2}, method='COBYLA', tol=1e-1,
+                                    constraints=constraints + [{'type': 'ineq', 'fun': lambda x: (x[1] - 100)*100000}]
                                     if (extrema_type == 'ts_best' and i == 0)
                                     else constraints))
 
