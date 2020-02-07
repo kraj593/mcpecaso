@@ -132,13 +132,11 @@ def optimal_switch_time_continuous(initial_concentrations, time_end, model, max_
 
     if extrema_type == 'ts_best':
         initial_guesses = [[2, 100, 33], [2, 100, 75], [2, 40, 20], [2, 75, 0]]
-        #constraints.append({'type': 'ineq', 'fun': lambda x: (x[0] - 0.01)})
 
     if min_productivity:
         constraints.append({'type': 'ineq', 'fun': productivity_constraint_continuous,
                             'args': ([min_productivity, initial_concentrations, time_end, model, max_growth,
                                       biomass_rxn, substrate_rxn, target_rxn, settings])})
-
     if min_yield:
         constraints.append({'type': 'ineq', 'fun': yield_constraint_continuous,
                             'args': ([min_yield, initial_concentrations, time_end, model, max_growth,
