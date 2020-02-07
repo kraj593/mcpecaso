@@ -125,8 +125,7 @@ def optimal_switch_time_continuous(initial_concentrations, time_end, model, max_
         constraints.append({'type': 'ineq', 'fun': lambda x: (x[2] - x[1])*1000})
 
     if extrema_type == 'ts_sub':
-        initial_guesses = [[1, 100, 0], [10, 100, 0]]
-        constraints.append({'type': 'ineq', 'fun': lambda x: (x[0] - 0.01)})
+        initial_guesses = [[1, 100, 0], [5, 100, 0]]
         constraints.append({'type': 'ineq', 'fun': lambda x: (x[1] - 100)*100})
         constraints.append({'type': 'ineq', 'fun': lambda x: (0 - x[2])*100})
 
