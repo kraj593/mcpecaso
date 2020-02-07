@@ -157,7 +157,6 @@ def optimal_switch_time_continuous(initial_concentrations, time_end, model, max_
                                     constraints=constraints + [{'type': 'ineq', 'fun': lambda x: (x[1] - 100)*100}]
                                     if (i == 0 and extrema_type == 'ts_best')
                                     else constraints))
-    print(opt_results)
     successful_opt_values = [opt.fun for opt in opt_results if opt.success]
     if successful_opt_values:
         opt_result = [opt for opt in opt_results if opt.fun == min(successful_opt_values)][0]
