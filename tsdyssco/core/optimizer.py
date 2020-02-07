@@ -131,7 +131,7 @@ def optimal_switch_time_continuous(initial_concentrations, time_end, model, max_
         constraints.append({'type': 'ineq', 'fun': lambda x: (0 - x[2])*100})
 
     if extrema_type == 'ts_best':
-        initial_guesses = [[2, 100, 33], [2, 100, 75], [2, 40, 20], [2, 75, 0]]
+        initial_guesses = [[2, 100, 33], [2, 100, 75], [2, 40, 20], [2, 50, 0]]
 
     if min_productivity:
         constraints.append({'type': 'ineq', 'fun': productivity_constraint_continuous,
@@ -151,7 +151,7 @@ def optimal_switch_time_continuous(initial_concentrations, time_end, model, max_
         opt_results.append(minimize(optimization_target_continuous, x0=np.array(initial_guesses[i]),
                                     args=(initial_concentrations, time_end, model, max_growth, biomass_rxn,
                                           substrate_rxn, target_rxn, objective_fun, settings),
-                                    options={'maxiter': 1000, 'catol': 4e-2}, method='COBYLA', tol=1e-3,
+                                    options={'maxiter': 1000, 'catol': 4e-2}, method='COBYLA', tol=1e-1,
                                     constraints=constraints + [{'type': 'ineq', 'fun': lambda x: (x[1] - 100)*100}]
                                     if (i == 0 and extrema_type == 'ts_best')
                                     else constraints))
