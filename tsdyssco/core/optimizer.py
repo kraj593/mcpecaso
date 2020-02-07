@@ -154,9 +154,7 @@ def optimal_switch_time_continuous(initial_concentrations, time_end, model, max_
                                     args=(initial_concentrations, time_end, model, max_growth, biomass_rxn,
                                           substrate_rxn, target_rxn, objective_fun, settings),
                                     options={'maxiter': 1000, 'catol': 4e-2}, method='COBYLA', tol=1e-2,
-                                    constraints=constraints+[{'type': 'ineq', 'fun': lambda x: (x[1] - 100)*100}]
-                                    if (extrema_type=='ts_best' and i==0)
-                                    else constraints))
+                                    constraints=constraints))
 
     successful_opt_values = [opt.fun for opt in opt_results if opt.success]
     if successful_opt_values:
