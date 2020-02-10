@@ -1,11 +1,11 @@
 import sys
 import colorlover as cl
-from plotly import tools
+from plotly import tools, io
 import plotly.graph_objs as go
 import warnings
 import numpy as np
 from tsdyssco.core.TSDyssco import TSDyssco
-
+io.templates.default = None
 try:
     _ = __IPYTHON__
 except NameError:
