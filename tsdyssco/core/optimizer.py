@@ -151,7 +151,8 @@ def optimal_switch_time_continuous(initial_concentrations, time_end, model, max_
                                     args=(initial_concentrations, time_end, model, max_growth, biomass_rxn,
                                           substrate_rxn, target_rxn, objective_fun, settings),
                                     options={'maxiter': 1000, 'catol': 4e-2}, method='COBYLA', tol=1e-1,
-                                    constraints=constraints + [{'type': 'ineq', 'fun': lambda x: (x[1] - 100)*100}]
+                                    constraints=constraints + [{'type': 'ineq', 'fun': lambda x: (x[1] - 100)*100},
+                                                               {'type': 'ineq', 'fun': lambda x: (x[0])*100}]
                                     if (i == 0 and extrema_type == 'ts_best')
                                     else constraints))
     successful_opt_values = [opt.fun for opt in opt_results if opt.success]
@@ -159,6 +160,10 @@ def optimal_switch_time_continuous(initial_concentrations, time_end, model, max_
         opt_result = [opt for opt in opt_results if opt.fun == min(successful_opt_values)][0]
     else:
         opt_result = opt_results[0]
+    for opt in opt_results:
+        if extrema_type == 'ts_best' and opt and opt.x[1] == 100:
+            if abs(abs(opt_result.fun) - abs(opt.fun))/abs(opt_result.fun) < 0.01:
+                opt_result = opt
 
     temp_data, temp_time = two_stage_timecourse_continuous(initial_concentrations, time_end, opt_result.x[0],
                                                            opt_result.x[1], opt_result.x[2], model, max_growth,
