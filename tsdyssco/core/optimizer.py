@@ -162,7 +162,7 @@ def optimal_switch_time_continuous(initial_concentrations, time_end, model, max_
         opt_result = opt_results[0]
     for opt in opt_results:
         if extrema_type == 'ts_best' and opt and opt.x[1] == 100:
-            if abs(abs(opt_result.fun) - abs(opt.fun))/abs(opt_result.fun) < 0.025:
+            if abs(abs(opt_result.fun) - abs(opt.fun))/abs(opt_result.fun) < 0.05:
                 opt_result = opt
 
     temp_data, temp_time = two_stage_timecourse_continuous(initial_concentrations, time_end, opt_result.x[0],
