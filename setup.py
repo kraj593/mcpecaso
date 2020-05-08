@@ -4,10 +4,10 @@ with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
 setuptools.setup(
-    name='tsdyssco',
+    name='mcpecaso',
     version='1.0.0',
     packages=setuptools.find_packages(),
-    url='www.github.com/kraj593/tsdyssco',
+    url='www.github.com/kraj593/mcpecaso',
     license='',
     author='Kaushik Raj',
     author_email='kraj593@gmail.com',

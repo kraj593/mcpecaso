@@ -4,7 +4,7 @@ from plotly import tools, io
 import plotly.graph_objs as go
 import warnings
 import numpy as np
-from tsdyssco.core.TSDyssco import TSDyssco
+from mcpecaso.core.mcPECASO import TSDyssco
 io.templates.default = None
 try:
     _ = __IPYTHON__
@@ -198,7 +198,7 @@ def multiplot_envelopes(dyssco_list):
         return fig
 
     else:
-        warnings.warn('The given object is not a tsdyssco object.')
+        warnings.warn('The given object is not a mcpecaso object.')
 
 
 def plot_envelope(dyssco):
@@ -259,7 +259,7 @@ def plot_envelope(dyssco):
             warnings.warn('The given dyssco model does not contain a production envelope.')
 
     else:
-        warnings.warn('The given object is not a tsdyssco object.')
+        warnings.warn('The given object is not a mcpecaso object.')
 
 
 def two_stage_char_contour(dyssco):
@@ -384,7 +384,7 @@ def two_stage_char_contour(dyssco):
             warnings.warn('The given dyssco model does not contain two stage fermentations.')
 
     else:
-        warnings.warn('The given object is not a tsdyssco object.')
+        warnings.warn('The given object is not a mcpecaso object.')
 
 
 def multi_two_stage_char_contours(dyssco_list):
@@ -601,4 +601,4 @@ def plot_dyssco_dfba(dyssco):
             warnings.warn('The given dyssco model does not contain two stage fermentations.')
 
     else:
-        warnings.warn('The given object is not a tsdyssco object.')
+        warnings.warn('The given object is not a mcpecaso object.')
