@@ -10,7 +10,7 @@ from .settings import settings
 from copy import deepcopy
 
 
-class TSDyssco(object):
+class mcPECASO(object):
 
     def __init__(self, **kwargs):
         self.model = None
