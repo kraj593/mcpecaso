@@ -16,6 +16,7 @@ class Settings:
         self.productivity_constraint = 0
         self.yield_constraint = 0
         self.titer_constraint = 0
+        self.scope = 'global'
 
 
 settings = Settings()
