@@ -8,7 +8,7 @@ or you can use [Anaconda](https://www.continuum.io/downloads).
 ### Fresh install
 First, clone the repository. You will need your github username and password but if you are here presumably you are logged in.
     
-    git clone http://github.com/kraj593/tsdyssco
+    git clone http://github.com/kraj593/mcpecaso
     cd tsdyssco
 
 Install the dependencies for the project using requirements.txt:
