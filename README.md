@@ -1,4 +1,4 @@
-# ts-DySScO
+# mcPECASO
 A two stage optimization framework that finds optimal operating points to maximize desired process variables (productivity/yield/titer/linear combination of these)
 
 ## Install
