@@ -453,7 +453,6 @@ def multi_two_stage_char_contours(pecaso_list):
                                                       range(len(pecaso.two_stage_characteristics[characteristic]))],
                                                 contours=dict(coloring='heatmap', showlabels=True,
                                                               labelfont=dict(size=12, color='white')),
-                                                colorscale='RdBu',
                                                 colorbar=dict(title=characteristic.title() + '<br>' + units[row],
                                                               titleside='right',
                                                               titlefont=dict(size=14),
