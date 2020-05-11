@@ -1,10 +1,11 @@
 import sys
 import colorlover as cl
 from plotly import tools, io
+from plotly.subplots import make_subplots
 import plotly.graph_objs as go
 import warnings
 import numpy as np
-from mcpecaso.core.mcPECASO import TSDyssco
+from mcpecaso.core.mcPECASO import mcPECASO
 io.templates.default = None
 try:
     _ = __IPYTHON__
@@ -66,26 +67,26 @@ def titlemaker(title, line_length):
     return new_title
         
 
-def multiplot_envelopes(dyssco_list):
+def multiplot_envelopes(pecaso_list):
 
-    if sum([type(dyssco) == TSDyssco for dyssco in dyssco_list]) == len(dyssco_list):
-        num_of_conditions = len(dyssco_list)
-        condition_list = [dyssco.condition for dyssco in dyssco_list]
+    if sum([type(pecaso) == mcPECASO for pecaso in pecaso_list]) == len(pecaso_list):
+        num_of_conditions = len(pecaso_list)
+        condition_list = [pecaso.condition for pecaso in pecaso_list]
 
         if len(set(condition_list)) != len(condition_list):
-            warnings.warn("You have duplicate conditions in your list of dyssco objects. Please ensure that the "
-                          "conditions are unique in the list of dyssco objects and try again.")
+            warnings.warn("You have duplicate conditions in your list of pecaso objects. Please ensure that the "
+                          "conditions are unique in the list of pecaso objects and try again.")
             return
 
-        envelope_check_list = [dyssco.production_envelope is None for dyssco in dyssco_list]
+        envelope_check_list = [pecaso.production_envelope is None for pecaso in pecaso_list]
 
         if any(envelope_check_list):
-            warnings.warn("One or more of the dyssco objects do not have a production envelope. Please ensure"
-                          "that all your dyssco models are complete and that they have production envelopes.")
+            warnings.warn("One or more of the pecaso objects do not have a production envelope. Please ensure"
+                          "that all your pecaso models are complete and that they have production envelopes.")
             return
 
-        envelope_dict = {condition: dyssco.production_envelope
-                         for condition, dyssco in zip(condition_list, dyssco_list)}
+        envelope_dict = {condition: pecaso.production_envelope
+                         for condition, pecaso in zip(condition_list, pecaso_list)}
         colors = get_colors(len(condition_list))
         max_growth = max([max(envelope['growth_rates']) for envelope in list(envelope_dict.values())])
         max_uptake = max([max(envelope['substrate_uptake_rates']) for envelope in list(envelope_dict.values())])
@@ -93,9 +94,9 @@ def multiplot_envelopes(dyssco_list):
         max_yield = max([max(envelope['yield_ub']) for envelope in list(envelope_dict.values())])
 
         if num_of_conditions <= 4:
-            fig = tools.make_subplots(rows=3, cols=num_of_conditions,
-                                      subplot_titles=[titlemaker(condition, 20) for condition in condition_list],
-                                      vertical_spacing=0.1, print_grid=False)
+            fig = make_subplots(rows=3, cols=num_of_conditions,
+                                subplot_titles=[titlemaker(condition, 20) for condition in condition_list],
+                                vertical_spacing=0.1, print_grid=False)
 
             for col, condition in enumerate(envelope_dict):
                 fig.append_trace(go.Scatter(x=envelope_dict[condition]['growth_rates'],
@@ -150,9 +151,9 @@ def multiplot_envelopes(dyssco_list):
             warnings.warn("You are trying to plot more than 4 conditions. All conditions can only be plotted on the"
                           " same graph for each item.")
 
-        fig = tools.make_subplots(rows=1, cols=3, subplot_titles=
-                                  ['Substrate Uptake Rate', 'Product Flux', 'Product Yield'],
-                                  print_grid=False, horizontal_spacing=0.1)
+        fig = make_subplots(rows=1, cols=3, subplot_titles=
+                            ['Substrate Uptake Rate', 'Product Flux', 'Product Yield'],
+                            print_grid=False, horizontal_spacing=0.1)
 
         for i, condition in enumerate(envelope_dict):
             fig.append_trace(go.Scatter(x=list(envelope_dict[condition]['growth_rates']),
@@ -201,14 +202,14 @@ def multiplot_envelopes(dyssco_list):
         warnings.warn('The given object is not a mcpecaso object.')
 
 
-def plot_envelope(dyssco):
-    if type(dyssco) == TSDyssco:
-        envelope = dyssco.production_envelope
+def plot_envelope(pecaso):
+    if type(pecaso) == mcPECASO:
+        envelope = pecaso.production_envelope
         if envelope is not None:
-            target_metabolite = list(dyssco.target_rxn.metabolites.keys())[0].name
-            fig = tools.make_subplots(rows=1, cols=3, subplot_titles=['Substrate Uptake Rate', 'Product Flux',
-                                                                      'Product Yield'],
-                                      horizontal_spacing=0.1, print_grid=False)
+            target_metabolite = list(pecaso.target_rxn.metabolites.keys())[0].name
+            fig = make_subplots(rows=1, cols=3, subplot_titles=['Substrate Uptake Rate', 'Product Flux',
+                                                                'Product Yield'],
+                                horizontal_spacing=0.1, print_grid=False)
             colors = get_colors(1)
             fig.append_trace(go.Scatter(x=envelope['growth_rates'],
                                         y=envelope['substrate_uptake_rates'],
@@ -242,7 +243,7 @@ def plot_envelope(dyssco):
             fig['layout']['yaxis2']['title'] = 'Product Flux<br>(mmol/gdw.h)'
             fig['layout']['yaxis3']['title'] = 'Product Yield<br>(mmol/mmol substrate)'
             fig['layout']['showlegend'] = False
-            fig['layout']['title'] = str(target_metabolite) + ' production characteristics in ' + str(dyssco.model.id)
+            fig['layout']['title'] = str(target_metabolite) + ' production characteristics in ' + str(pecaso.model.id)
             fig['layout']['yaxis1']['range'] = [0,
                                                 1.2 * max(envelope['substrate_uptake_rates'])]
             fig['layout']['yaxis2']['range'] = [min(envelope['production_rates_lb']),
@@ -256,19 +257,19 @@ def plot_envelope(dyssco):
             return fig
 
         else:
-            warnings.warn('The given dyssco model does not contain a production envelope.')
+            warnings.warn('The given mcpecaso model does not contain a production envelope.')
 
     else:
         warnings.warn('The given object is not a mcpecaso object.')
 
 
-def two_stage_char_contour(dyssco):
-    if type(dyssco) == TSDyssco:
-        ts_fermentations = dyssco.two_stage_fermentation_list
+def two_stage_char_contour(pecaso):
+    if type(pecaso) == mcPECASO:
+        ts_fermentations = pecaso.two_stage_fermentation_list
 
         if ts_fermentations:
-            target_metabolite = list(dyssco.target_rxn.metabolites.keys())[0].name
-            if dyssco.objective_name not in ['productivity', 'yield', 'titer']:
+            target_metabolite = list(pecaso.target_rxn.metabolites.keys())[0].name
+            if pecaso.objective_name not in ['productivity', 'yield', 'titer']:
 
                 attribute_names = ['batch_productivity', 'batch_yield', 'batch_titer', 'objective_value']
                 characteristics = ['productivity', 'yield', 'titer', 'objective value']
@@ -278,34 +279,34 @@ def two_stage_char_contour(dyssco):
 
             units = ['(mmol/L.h)', '(mmol product/mmol substrate)', '(mmol/L)', '(a.u.)']
             titles = [str(target_metabolite) + ' ' + characteristic + " distribution for two stage fermentation in "
-                      + str(dyssco.model.id) + '. Objective: ' + str(dyssco.objective_name)
+                      + str(pecaso.model.id) + '. Objective: ' + str(pecaso.objective_name)
                       for characteristic in characteristics]
             fig_list = []
             for row, characteristic in enumerate(characteristics):
                 tracelist = list()
-                tracelist.append(go.Scatter(x=np.linspace(0, max(dyssco.two_stage_characteristics
+                tracelist.append(go.Scatter(x=np.linspace(0, max(pecaso.two_stage_characteristics
                                                                  ['stage_one_growth_rate']), 10),
-                                            y=np.linspace(0, max(dyssco.two_stage_characteristics
+                                            y=np.linspace(0, max(pecaso.two_stage_characteristics
                                                                  ['stage_two_growth_rate']), 10), mode='lines',
                                             name='One Stage Points',
                                             line={'color': 'rgb(255, 218, 68)', 'dash': 'dash'},
                                             showlegend=True))
-                tracelist.append(go.Contour(z=dyssco.two_stage_characteristics[characteristic],
-                                            x=dyssco.two_stage_characteristics['stage_one_growth_rate'],
-                                            y=dyssco.two_stage_characteristics['stage_two_growth_rate'],
+                tracelist.append(go.Contour(z=pecaso.two_stage_characteristics[characteristic],
+                                            x=pecaso.two_stage_characteristics['stage_one_growth_rate'],
+                                            y=pecaso.two_stage_characteristics['stage_two_growth_rate'],
                                             hoverinfo='text',
                                             text=['Stage 1 growth rate: ' +
                                                   str(round(
-                                                      dyssco.two_stage_characteristics['stage_one_growth_rate'][i],
+                                                      pecaso.two_stage_characteristics['stage_one_growth_rate'][i],
                                                       3)) +
                                                   '<br>Stage 2 growth rate: ' +
                                                   str(round(
-                                                      dyssco.two_stage_characteristics['stage_two_growth_rate'][i],
+                                                      pecaso.two_stage_characteristics['stage_two_growth_rate'][i],
                                                       3)) +
                                                   '<br>' + characteristic.title() + ': ' +
-                                                  str(round(dyssco.two_stage_characteristics[characteristic][i], 3))
+                                                  str(round(pecaso.two_stage_characteristics[characteristic][i], 3))
                                                   for i in
-                                                  range(len(dyssco.two_stage_characteristics[characteristic]))],
+                                                  range(len(pecaso.two_stage_characteristics[characteristic]))],
                                             showlegend=False,
                                             ncontours=20,
                                             contours=dict(coloring='heatmap', showlabels=True,
@@ -322,46 +323,46 @@ def two_stage_char_contour(dyssco):
                                                           len=1.05,
                                                           lenmode='fraction',
                                                           outlinewidth=1)))
-                if dyssco.two_stage_best_batch:
-                    tracelist.append(go.Scatter(x=[dyssco.two_stage_best_batch.stage_one_fluxes[0]],
-                                                y=[dyssco.two_stage_best_batch.stage_two_fluxes[0]],
+                if pecaso.two_stage_best_batch:
+                    tracelist.append(go.Scatter(x=[pecaso.two_stage_best_batch.stage_one_fluxes[0]],
+                                                y=[pecaso.two_stage_best_batch.stage_two_fluxes[0]],
                                                 mode='markers', hoverinfo='text', showlegend=True,
                                                 name='Best Two Stage Point',
                                                 text=['Best Two Stage Point<br>' + characteristic.title() + ': ' +
-                                                      str(round(getattr(dyssco.two_stage_best_batch,
+                                                      str(round(getattr(pecaso.two_stage_best_batch,
                                                                         attribute_names[row]), 3))],
                                                 marker=dict(color='rgb(81, 206, 59)',
                                                             size=10)))
-                if dyssco.one_stage_best_batch:
-                    tracelist.append(go.Scatter(x=[dyssco.one_stage_best_batch.fluxes[0]],
-                                                y=[dyssco.one_stage_best_batch.fluxes[0]],
+                if pecaso.one_stage_best_batch:
+                    tracelist.append(go.Scatter(x=[pecaso.one_stage_best_batch.fluxes[0]],
+                                                y=[pecaso.one_stage_best_batch.fluxes[0]],
                                                 name='Best One Stage Point',
                                                 mode='markers', hoverinfo='text', showlegend=True,
                                                 text=['Best One Stage Point<br>' + characteristic.title() + ': ' +
-                                                      str(round(getattr(dyssco.one_stage_best_batch,
+                                                      str(round(getattr(pecaso.one_stage_best_batch,
                                                                         attribute_names[row]), 3))],
                                                 marker=dict(color='rgb(252, 217, 17)',
                                                             size=10)))
-                if dyssco.two_stage_suboptimal_batch:
-                    tracelist.append(go.Scatter(x=[dyssco.two_stage_suboptimal_batch.stage_one_fluxes[0]],
-                                                y=[dyssco.two_stage_suboptimal_batch.stage_two_fluxes[0]],
+                if pecaso.two_stage_suboptimal_batch:
+                    tracelist.append(go.Scatter(x=[pecaso.two_stage_suboptimal_batch.stage_one_fluxes[0]],
+                                                y=[pecaso.two_stage_suboptimal_batch.stage_two_fluxes[0]],
                                                 name='Max Growth to Min Growth Point',
                                                 mode='markers', hoverinfo='text', showlegend=True,
                                                 text=['Max Growth to Min Growth Point<br>' +
                                                       characteristic.title() + ': ' +
-                                                      str(round(getattr(dyssco.two_stage_suboptimal_batch,
+                                                      str(round(getattr(pecaso.two_stage_suboptimal_batch,
                                                                         attribute_names[row]), 3))],
                                                 marker=dict(color='rgb(255, 0, 0)',
                                                             size=10)))
 
                 fig = go.Figure(data=tracelist)
-                fig['layout']['xaxis']['range'] = [0, np.ceil(max(dyssco.two_stage_characteristics
+                fig['layout']['xaxis']['range'] = [0, np.ceil(max(pecaso.two_stage_characteristics
                                                                   ['stage_one_growth_rate'])/0.05)*0.05]
-                fig['layout']['xaxis']['dtick'] = np.around((max(dyssco.two_stage_characteristics
+                fig['layout']['xaxis']['dtick'] = np.around((max(pecaso.two_stage_characteristics
                                                                  ['stage_one_growth_rate'])) / 5, 2)
-                fig['layout']['yaxis']['range'] = [0, np.ceil(max(dyssco.two_stage_characteristics
+                fig['layout']['yaxis']['range'] = [0, np.ceil(max(pecaso.two_stage_characteristics
                                                                   ['stage_two_growth_rate'])/0.05)*0.05]
-                fig['layout']['yaxis']['dtick'] = np.around((max(dyssco.two_stage_characteristics
+                fig['layout']['yaxis']['dtick'] = np.around((max(pecaso.two_stage_characteristics
                                                                  ['stage_two_growth_rate'])) / 5, 2)
                 fig['layout']['yaxis']['title'] = 'Stage 2 Growth Rate<br>(1/h)'
                 fig['layout']['xaxis']['title'] = 'Stage 1 Growth Rate<br>(1/h)'
@@ -381,30 +382,30 @@ def two_stage_char_contour(dyssco):
 
             return tuple(fig_list)
         else:
-            warnings.warn('The given dyssco model does not contain two stage fermentations.')
+            warnings.warn('The given mcpecaso model does not contain two stage fermentations.')
 
     else:
         warnings.warn('The given object is not a mcpecaso object.')
 
 
-def multi_two_stage_char_contours(dyssco_list):
-    if sum([type(dyssco) == TSDyssco for dyssco in dyssco_list]) == len(dyssco_list):
-        num_of_conditions = len(dyssco_list)
-        condition_list = [dyssco.condition for dyssco in dyssco_list]
+def multi_two_stage_char_contours(pecaso_list):
+    if sum([type(pecaso) == mcPECASO for pecaso in pecaso_list]) == len(pecaso_list):
+        num_of_conditions = len(pecaso_list)
+        condition_list = [pecaso.condition for pecaso in pecaso_list]
         if len(set(condition_list)) != len(condition_list):
-            warnings.warn("You have duplicate conditions in your list of dyssco objects. Please ensure that the "
-                          "conditions are unique in the list of dyssco objects and try again.")
+            warnings.warn("You have duplicate conditions in your list of mcpecaso objects. Please ensure that the "
+                          "conditions are unique in the list of mcpecaso objects and try again.")
             return
 
-        ts_ferm_check_list = [len(dyssco.two_stage_fermentation_list) == 0 for dyssco in dyssco_list]
+        ts_ferm_check_list = [len(pecaso.two_stage_fermentation_list) == 0 for pecaso in pecaso_list]
 
         if any(ts_ferm_check_list):
-            warnings.warn("One or more of the dyssco objects do not have a production envelope. Please ensure"
-                          "that all your dyssco models are complete and that they have production envelopes.")
+            warnings.warn("One or more of the mcpecaso objects do not have a production envelope. Please ensure"
+                          "that all your mcpecaso models are complete and that they have production envelopes.")
             return
 
-        ts_char_dict = {condition: dyssco.two_stage_characteristics
-                        for condition, dyssco in zip(condition_list, dyssco_list)}
+        ts_char_dict = {condition: pecaso.two_stage_characteristics
+                        for condition, pecaso in zip(condition_list, pecaso_list)}
         max_stage_one_growth = max([max(ts_char['stage_one_growth_rate']) for ts_char in list(ts_char_dict.values())])
         max_stage_two_growth = max([max(ts_char['stage_two_growth_rate']) for ts_char in list(ts_char_dict.values())])
 
@@ -420,36 +421,36 @@ def multi_two_stage_char_contours(dyssco_list):
 
             for row, characteristic in enumerate(characteristics):
                 max_characteristic = max(
-                    [max(dyssco.two_stage_characteristics[characteristic]) for dyssco in dyssco_list])
+                    [max(pecaso.two_stage_characteristics[characteristic]) for pecaso in pecaso_list])
                 min_characteristic = min(
-                    [min(dyssco.two_stage_characteristics[characteristic]) for dyssco in dyssco_list])
-                fig = tools.make_subplots(rows=1, cols=len(dyssco_list),
-                                          subplot_titles=[dyssco.condition for dyssco in dyssco_list],
-                                          horizontal_spacing=0.05, print_grid=False)
+                    [min(pecaso.two_stage_characteristics[characteristic]) for pecaso in pecaso_list])
+                fig = make_subplots(rows=1, cols=len(pecaso_list),
+                                    subplot_titles=[pecaso.condition for pecaso in pecaso_list],
+                                    horizontal_spacing=0.05, print_grid=False)
 
-                for col, dyssco in enumerate(dyssco_list):
-                    fig.append_trace(go.Scatter(x=np.linspace(0, max(dyssco.two_stage_characteristics
+                for col, pecaso in enumerate(pecaso_list):
+                    fig.append_trace(go.Scatter(x=np.linspace(0, max(pecaso.two_stage_characteristics
                                                                      ['stage_one_growth_rate']), 10),
-                                                y=np.linspace(0, max(dyssco.two_stage_characteristics
+                                                y=np.linspace(0, max(pecaso.two_stage_characteristics
                                                                      ['stage_two_growth_rate']), 10), mode='lines',
                                                 name='One Stage Points',
                                                 line={'color': 'rgb(255, 218, 68)', 'dash': 'dash'},
-                                                showlegend=True if col == len(dyssco_list)-1 else False,
+                                                showlegend=True if col == len(pecaso_list)-1 else False,
                                                 legendgroup='One Stage Points'), 1, col + 1)
-                    fig.append_trace(go.Contour(z=dyssco.two_stage_characteristics[characteristic],
-                                                x=dyssco.two_stage_characteristics['stage_one_growth_rate'],
-                                                y=dyssco.two_stage_characteristics['stage_two_growth_rate'],
+                    fig.append_trace(go.Contour(z=pecaso.two_stage_characteristics[characteristic],
+                                                x=pecaso.two_stage_characteristics['stage_one_growth_rate'],
+                                                y=pecaso.two_stage_characteristics['stage_two_growth_rate'],
                                                 showlegend=False, hoverinfo='text',
                                                 text=['Stage 1 growth rate: ' +
-                                                      str(dyssco.two_stage_characteristics['stage_one_growth_rate'][
+                                                      str(pecaso.two_stage_characteristics['stage_one_growth_rate'][
                                                               i]) +
                                                       '<br>Stage 2 growth rate: ' +
-                                                      str(dyssco.two_stage_characteristics['stage_two_growth_rate'][
+                                                      str(pecaso.two_stage_characteristics['stage_two_growth_rate'][
                                                               i]) +
                                                       '<br>' + characteristic.title() + ': ' +
-                                                      str(round(dyssco.two_stage_characteristics[characteristic][i], 3))
+                                                      str(round(pecaso.two_stage_characteristics[characteristic][i], 3))
                                                       for i in
-                                                      range(len(dyssco.two_stage_characteristics[characteristic]))],
+                                                      range(len(pecaso.two_stage_characteristics[characteristic]))],
                                                 contours=dict(coloring='heatmap', showlabels=True,
                                                               labelfont=dict(size=12, color='white')),
                                                 colorscale='RdBu',
@@ -468,39 +469,39 @@ def multi_two_stage_char_contours(dyssco_list):
                                                               outlinewidth=1),
                                                 zmin=min_characteristic, zmax=max_characteristic, ncontours=20), 1,
                                      col + 1)
-                    if dyssco.one_stage_best_batch:
-                        fig.append_trace(go.Scatter(x=[dyssco.one_stage_best_batch.fluxes[0]],
-                                                    y=[dyssco.one_stage_best_batch.fluxes[0]],
+                    if pecaso.one_stage_best_batch:
+                        fig.append_trace(go.Scatter(x=[pecaso.one_stage_best_batch.fluxes[0]],
+                                                    y=[pecaso.one_stage_best_batch.fluxes[0]],
                                                     name='Best One Stage Point',
                                                     mode='markers', hoverinfo='text',
-                                                    showlegend=True if col == len(dyssco_list)-1 else False,
+                                                    showlegend=True if col == len(pecaso_list)-1 else False,
                                                     text=['Best One Stage Point<br>' + characteristic.title() + ': ' +
-                                                          str(round(getattr(dyssco.one_stage_best_batch,
+                                                          str(round(getattr(pecaso.one_stage_best_batch,
                                                                             attribute_names[row]), 3))],
                                                     marker=dict(color='rgb(252, 217, 17)',
                                                                 size=10),
                                                     legendgroup='Best One Stage Point'), 1, col+1)
-                    if dyssco.two_stage_suboptimal_batch:
-                        fig.append_trace(go.Scatter(x=[dyssco.two_stage_suboptimal_batch.stage_one_fluxes[0]],
-                                                    y=[dyssco.two_stage_suboptimal_batch.stage_two_fluxes[0]],
+                    if pecaso.two_stage_suboptimal_batch:
+                        fig.append_trace(go.Scatter(x=[pecaso.two_stage_suboptimal_batch.stage_one_fluxes[0]],
+                                                    y=[pecaso.two_stage_suboptimal_batch.stage_two_fluxes[0]],
                                                     name='Max Growth to Min Growth Point',
                                                     mode='markers', hoverinfo='text',
-                                                    showlegend=True if col == len(dyssco_list) - 1 else False,
+                                                    showlegend=True if col == len(pecaso_list) - 1 else False,
                                                     text=['Max Growth to Min Growth Point<br>' +
                                                           characteristic.title() + ': ' +
-                                                          str(round(getattr(dyssco.two_stage_suboptimal_batch,
+                                                          str(round(getattr(pecaso.two_stage_suboptimal_batch,
                                                                             attribute_names[row]), 3))],
                                                     marker=dict(color='rgb(255, 0, 0)',
                                                                 size=10),
                                                     legendgroup='Max Growth to Min Growth Point'), 1, col + 1)
-                    if dyssco.two_stage_best_batch:
-                        fig.append_trace(go.Scatter(x=[dyssco.two_stage_best_batch.stage_one_fluxes[0]],
-                                                    y=[dyssco.two_stage_best_batch.stage_two_fluxes[0]],
+                    if pecaso.two_stage_best_batch:
+                        fig.append_trace(go.Scatter(x=[pecaso.two_stage_best_batch.stage_one_fluxes[0]],
+                                                    y=[pecaso.two_stage_best_batch.stage_two_fluxes[0]],
                                                     mode='markers', hoverinfo='text',
-                                                    showlegend=True if col == len(dyssco_list) - 1 else False,
+                                                    showlegend=True if col == len(pecaso_list) - 1 else False,
                                                     name='Best Two Stage Point',
                                                     text=['Best Two Stage Point<br>' + characteristic.title() + ': ' +
-                                                          str(round(getattr(dyssco.two_stage_best_batch,
+                                                          str(round(getattr(pecaso.two_stage_best_batch,
                                                                             attribute_names[row]), 3))],
                                                     marker=dict(color='rgb(81, 206, 59)',
                                                                 size=10),
@@ -516,7 +517,7 @@ def multi_two_stage_char_contours(dyssco_list):
                     fig['layout']['xaxis' + str(col + 1)]['ticks'] = 'outside'
                     fig['layout']['yaxis' + str(col + 1)]['ticks'] = 'outside'
                 fig['layout']['height'] = 490
-                fig['layout']['width'] = 100 + len(dyssco_list) * 285
+                fig['layout']['width'] = 100 + len(pecaso_list) * 285
                 fig['layout']['title'] = titlemaker(titles[row], 100)
                 fig['layout']['hovermode'] = 'closest'
                 fig['layout']['legend']['orientation'] = 'h'
@@ -527,26 +528,26 @@ def multi_two_stage_char_contours(dyssco_list):
 
             return tuple(fig_list)
         else:
-            warnings.warn('There are too many dyssco objects in this list. This function can handle a maximum of 3'
+            warnings.warn('There are too many mcpecaso objects in this list. This function can handle a maximum of 3'
                           ' objects')
 
     else:
-        warnings.warn('One or more of the objects in this list are not Dyssco objects.')
+        warnings.warn('One or more of the objects in this list are not mcpecaso objects.')
 
 
-def plot_dyssco_dfba(dyssco):
+def plot_pecaso_dfba(pecaso):
 
-    if type(dyssco) == TSDyssco:
-        ts_fermentations = dyssco.two_stage_fermentation_list
+    if type(pecaso) == mcPECASO:
+        ts_fermentations = pecaso.two_stage_fermentation_list
 
         if ts_fermentations:
-            ts_suboptimal = dyssco.two_stage_suboptimal_batch
-            os_best = dyssco.one_stage_best_batch
-            ts_best = dyssco.two_stage_best_batch
+            ts_suboptimal = pecaso.two_stage_suboptimal_batch
+            os_best = pecaso.one_stage_best_batch
+            ts_best = pecaso.two_stage_best_batch
             titles = ['Traditional Two Stage Batch', 'Best One Stage Batch', 'Best Two Stage Batch']
             ferm_list = [ts_suboptimal, os_best, ts_best]
-            fig = tools.make_subplots(rows=1, cols=3, subplot_titles=[titlemaker(title, 25) for title in titles],
-                                      print_grid=False)
+            fig = make_subplots(rows=1, cols=3, subplot_titles=[titlemaker(title, 25) for title in titles],
+                                print_grid=False)
             max_conc = max([(max([max(data) for data in ferm.data])) for ferm in ferm_list])
             max_t = max([max(ferm.time) for ferm in ferm_list])
             for col, ferm in enumerate(ferm_list):
@@ -584,7 +585,7 @@ def plot_dyssco_dfba(dyssco):
                     fig['layout']['xaxis'+str(col+1)]['ticks'] = 'outside'
                     fig['layout']['yaxis'+str(col+1)]['ticks'] = 'outside'
 
-            target_metabolite = list(dyssco.target_rxn.metabolites.keys())[0].name
+            target_metabolite = list(pecaso.target_rxn.metabolites.keys())[0].name
             fig['layout']['yaxis']['title'] = 'Concentration (mmol/L or g/L)'
             fig['layout']['hovermode'] = 'closest'
             fig['layout']['height'] = 500
@@ -593,12 +594,12 @@ def plot_dyssco_dfba(dyssco):
             fig['layout']['legend']['x'] = 0
             fig['layout']['legend']['y'] = -0.25
             fig['layout']['legend']['orientation'] = 'h'
-            fig['layout']['title'] = 'Production Strategies for ' + target_metabolite + ' in ' + dyssco.model.id + \
-                                     '. Objective: ' + dyssco.objective_name.title()
+            fig['layout']['title'] = 'Production Strategies for ' + target_metabolite + ' in ' + pecaso.model.id + \
+                                     '. Objective: ' + pecaso.objective_name.title()
             plot(fig)
             return fig
         else:
-            warnings.warn('The given dyssco model does not contain two stage fermentations.')
+            warnings.warn('The given mcpecaso model does not contain two stage fermentations.')
 
     else:
         warnings.warn('The given object is not a mcpecaso object.')
