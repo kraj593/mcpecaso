@@ -9,7 +9,7 @@ or you can use [Anaconda](https://www.continuum.io/downloads).
 First, clone the repository. You will need your github username and password but if you are here presumably you are logged in.
     
     git clone http://github.com/kraj593/mcpecaso
-    cd tsdyssco
+    cd mcpecaso
 
 Install the dependencies for the project using requirements.txt:
 	
