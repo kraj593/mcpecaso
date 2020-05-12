@@ -4,5 +4,4 @@ joblib
 scipy
 numpy
 plotly
-cameo
 colorlover
